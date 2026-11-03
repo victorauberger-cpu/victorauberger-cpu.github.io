@@ -19,10 +19,13 @@ from pathlib import Path
 
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent.parent
-POSITIONS = ROOT / "data" / "positions.json"
-SETTINGS = ROOT / "data" / "settings.json"
-OUT = ROOT / "data" / "prices.json"
+# Works whether the files sit in a data/ folder or all at the top of the repository.
+_here = Path(__file__).resolve().parent
+_candidates = [_here.parent / "data", _here / "data", _here, _here.parent]
+DATA = next((d for d in _candidates if (d / "positions.json").exists()), _here)
+POSITIONS = DATA / "positions.json"
+SETTINGS = DATA / "settings.json"
+OUT = DATA / "prices.json"
 EOD = pd.Timedelta(hours=23, minutes=59)   # daily closes are stamped at the end of their day
 
 
