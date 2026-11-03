@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Victor Auberger</title>
+<meta name="description" content="Victor Auberger: student at ESCP Business School. Portfolio, research and contact.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbfaf7; --ink:#1b1b1a; --muted:#6d6b66; --faint:#e7e4dd; --card:#ffffff;
+    --accent:#1f4d8f; --up:#18794e; --down:#c0392b;
+    --serif:"Newsreader", Georgia, "Times New Roman", serif;
+    --mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#141413; --ink:#ecebe7; --muted:#9a978f; --faint:#2b2a27; --card:#1b1b19;
+           --accent:#8db4ff; --up:#4cc38a; --down:#ff7b6b; }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink)}
+  body{font-family:var(--serif);font-size:19px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:800px;margin:0 auto;padding:64px 24px 80px}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent}
+  a:hover{border-bottom-color:currentColor}
+  h1{font-weight:500;font-size:34px;margin:0 0 4px;letter-spacing:-.01em}
+  h2{font-family:var(--mono);font-weight:500;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:44px 0 14px}
+  .sub{color:var(--muted);margin:0}
+  nav{display:flex;flex-wrap:wrap;gap:6px 22px;margin:22px 0 8px;font-family:var(--mono);font-size:14px}
+  nav a{color:var(--muted)}
+  nav a.on{color:var(--ink);border-bottom-color:var(--ink)}
+  ul.plain{list-style:none;padding:0;margin:0}
+  ul.plain li{margin:6px 0}
+  ul.plain li::before{content:"–";color:var(--muted);margin-right:10px}
+  .note{color:var(--muted);font-size:16px}
+  .mono{font-family:var(--mono)}
+  footer{margin-top:72px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  section[hidden]{display:none}
+
+  /* Portfolio */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 22px}
+  .stat{border:1px solid var(--faint);background:var(--card);border-radius:8px;padding:12px 14px}
+  .stat b{display:block;font-family:var(--mono);font-weight:500;font-size:20px}
+  .stat > span{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .filters{display:flex;gap:8px;margin:0 0 12px;font-family:var(--mono);font-size:13px}
+  .filters button{font:inherit;background:none;border:1px solid var(--faint);color:var(--muted);padding:4px 12px;border-radius:999px;cursor:pointer}
+  .filters button.on{color:var(--bg);background:var(--ink);border-color:var(--ink)}
+  .tbl{overflow-x:auto;border:1px solid var(--faint);border-radius:8px;background:var(--card)}
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13px}
+  th,td{padding:10px 10px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--faint)}
+  th{font-weight:500;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;user-select:none}
+  tr:last-child td{border-bottom:none}
+  td.num,th.num{text-align:right}
+  .tick{font-weight:500}
+  .co{display:block;font-size:11px;color:var(--muted)}
+  .pill{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid currentColor}
+  .long{color:var(--up)} .short{color:var(--down)}
+  .up{color:var(--up)} .down{color:var(--down)}
+  .open{color:var(--muted);font-style:italic}
+  .thesis{display:block;font-family:var(--serif);font-size:14px;color:var(--muted);white-space:normal;min-width:130px;max-width:190px;margin-top:2px}
+
+  /* Home performance chart */
+  .small{font-size:14px}
+  .perf-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+  .perf-head .filters{margin:0}
+  .perf-val{font-family:var(--mono);font-size:26px;font-weight:500}
+  .chart{position:relative;height:220px;margin:4px 0 6px}
+  .chart svg{display:block;width:100%;height:100%;overflow:visible}
+  .chart .grid{stroke:var(--faint);stroke-width:1}
+  .chart .zero{stroke:var(--muted);stroke-width:1;stroke-dasharray:2 3}
+  .chart .ax{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+  .chart .line{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+  .chart .area{fill:var(--accent);opacity:.07}
+  .chart .cross{stroke:var(--muted);stroke-width:1}
+  .chart .dot{fill:var(--accent);stroke:var(--bg);stroke-width:2}
+  .tip{position:absolute;top:0;pointer-events:none;background:var(--card);border:1px solid var(--faint);border-radius:6px;padding:5px 9px;font-family:var(--mono);font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .tip b{font-weight:500}
+  .holdings li{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:14px}
+  .holdings li::before{display:none}
+  .holdings .tick{min-width:64px}
+  .holdings .since{color:var(--muted);flex:1}
+  .sample{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--down);border:1px solid currentColor;border-radius:4px;padding:0 6px;margin-left:6px}
+
+  /* Research */
+  .paper{border-top:1px solid var(--faint);padding:22px 0}
+  .paper:first-of-type{border-top:none;padding-top:4px}
+  .paper h3{font-weight:500;font-size:21px;line-height:1.35;margin:0 0 4px}
+  .meta{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+  details{margin:10px 0 12px}
+  summary{cursor:pointer;font-family:var(--mono);font-size:13px;color:var(--muted)}
+  details p{font-size:17px;margin:10px 0 0}
+  .links{display:flex;flex-wrap:wrap;gap:10px;font-family:var(--mono);font-size:13px}
+  .links a{border:1px solid var(--faint);padding:4px 12px;border-radius:6px;color:var(--ink)}
+  .links a:hover{border-color:var(--ink)}
+  .tag{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--faint);border-radius:4px;padding:1px 6px;margin-right:6px}
+
+  /* Contact */
+  dl.contact{display:grid;grid-template-columns:110px 1fr;gap:8px 16px;margin:0}
+  dl.contact dt{font-family:var(--mono);font-size:13px;color:var(--muted);padding-top:3px}
+  dl.contact dd{margin:0}
+
+  @media (max-width:600px){
+    body{font-size:17px}
+    .wrap{padding:40px 18px 60px}
+    .stats{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Victor Auberger</h1>
+    <p class="sub">Student, ESCP Business School</p>
+    <nav id="nav"></nav>
+  </header>
+
+  <!-- ================= HOME ================= -->
+  <section id="home">
+    <h2>Bio</h2>
+    <p>I'm a student at ESCP Business School. I'm interested in equity research, markets and corporate finance. I write research papers on the side and track my own investment ideas, long and short, on the <a href="#portfolio">portfolio</a> page.</p>
+
+    <h2>Current portfolio</h2>
+    <div class="perf-head">
+      <div><span id="perfVal" class="perf-val">–</span> <span id="perfLbl" class="note"></span></div>
+      <div class="filters" id="ranges">
+        <button data-r="1M">1M</button><button data-r="3M">3M</button><button data-r="YTD">YTD</button>
+        <button data-r="1Y">1Y</button><button data-r="ALL" class="on">All</button>
+      </div>
+    </div>
+    <div id="chart" class="chart" role="img" aria-label="Portfolio performance in percent"><div id="tip" class="tip" hidden></div></div>
+    <p class="note small" id="perfNote"></p>
+    <ul class="plain holdings" id="holdings"></ul>
+    <p class="note small"><a href="#portfolio">All positions →</a></p>
+
+    <h2>Elsewhere</h2>
+    <ul class="plain">
+      <li><a href="#research">Research</a></li>
+      <li><a href="https://x.com/YOUR_HANDLE">X / Twitter</a></li>
+      <li><a href="https://www.linkedin.com/in/YOUR_PROFILE">LinkedIn</a></li>
+      <li><a href="#contact">Email</a></li>
+    </ul>
+  </section>
+
+  <!-- ================= PORTFOLIO ================= -->
+  <section id="portfolio" hidden>
+    <h2>Portfolio</h2>
+    <p class="note">Positions I've taken, with entry and exit prices. Returns are per position, in % only. Not investment advice.</p>
+    <div class="stats" id="stats"></div>
+    <div class="filters" id="filters">
+      <button data-f="all" class="on">All</button>
+      <button data-f="open">Open</button>
+      <button data-f="closed">Closed</button>
+      <button data-f="long">Long</button>
+      <button data-f="short">Short</button>
+    </div>
+    <div class="tbl"><table id="pf"></table></div>
+    <p class="note" id="asof"></p>
+  </section>
+
+  <!-- ================= RESEARCH ================= -->
+  <section id="research" hidden>
+    <h2>Research</h2>
+    <div id="papers"></div>
+  </section>
+
+  <!-- ================= RECOMMENDATIONS ================= -->
+  <section id="recs" hidden>
+    <div id="recsBody"></div>
+  </section>
+
+  <!-- ================= CONTACT ================= -->
+  <section id="contact" hidden>
+    <h2>Contact</h2>
+    <p>The easiest way to reach me is by email. I'm happy to talk about markets, research, or anything on this site.</p>
+    <dl class="contact">
+      <dt>Email</dt><dd><a href="mailto:you@example.com">you@example.com</a></dd>
+      <dt>X</dt><dd><a href="https://x.com/YOUR_HANDLE">@YOUR_HANDLE</a></dd>
+      <dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/YOUR_PROFILE">linkedin.com/in/YOUR_PROFILE</a></dd>
+    </dl>
+  </section>
+
+  <footer>© <span id="yr"></span> Victor Auberger</footer>
+</div>
+
+<script>
+/* =====================================================================
+   EDIT YOUR CONTENT HERE (papers, recommendations).
+   Your trades live in data/positions.json. Prices are filled in automatically.
+   ===================================================================== */
+
+const SHOW_RECS = true;   // set to false to hide the Recommendations page
+
+// ⚠ SAMPLE DATA: replace with your papers.
+// researchgate: link to the paper's ResearchGate page. pdf: path to a PDF you put in the papers/ folder.
+const PAPERS = [
+  {
+    title:"[Paper title]: e.g. Momentum and Earnings Surprises in European Mid-Caps",
+    authors:"Victor Auberger, [Co-author]",
+    venue:"Working paper", year:2026, tags:["Asset pricing"],
+    abstract:"[Paste your abstract here.] One or two paragraphs summarising the question, the data, the method and the main finding.",
+    researchgate:"https://www.researchgate.net/publication/XXXXXXXX",
+    pdf:"papers/paper-1.pdf"
+  },
+  {
+    title:"[Second paper title]",
+    authors:"Victor Auberger",
+    venue:"ESCP Business School, Master's thesis", year:2025, tags:["Corporate finance"],
+    abstract:"[Paste your abstract here.]",
+    researchgate:"https://www.researchgate.net/publication/XXXXXXXX",
+    pdf:"papers/paper-2.pdf"
+  },
+];
+
+// Recommendations (optional page). Add or remove categories freely.
+const RECS = {
+  "Listening": [ {title:"[Album / artist]", url:"", note:"one-line comment"} ],
+  "Reading":   [ {title:"[Book], [Author]", url:"", note:"why it's worth it"} ],
+  "Watching":  [ {title:"[Film or series]", url:"", note:""} ],
+  "Playing":   [ {title:"[Game]", url:"", note:""} ],
+};
+
+/* ===================================================================== */
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pct = (v, d=1) => v == null || isNaN(v) ? "–" : (v>0?"+":v<0?"−":"") + Math.abs(v*100).toFixed(d) + "%";
+const cls = v => v > 0 ? "up" : v < 0 ? "down" : "";
+const fmtP = n => n == null ? "–" : Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtD = d => d ? new Date(d.slice(0,10)+"T00:00:00").toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) : "";
+const days = (a,b) => Math.round((new Date(b) - new Date(a)) / 864e5);
+$("#yr").textContent = new Date().getFullYear();
+
+// ---------- Navigation (#portfolio, #research, ...) ----------
+const PAGES = [["home","Home"],["portfolio","Portfolio"],["research","Research"],...(SHOW_RECS?[["recs","Recommendations"]]:[]),["contact","Contact"]];
+$("#nav").innerHTML = PAGES.map(([id,l]) => `<a href="#${id === "home" ? "" : id}" data-p="${id}">${l}</a>`).join("");
+function route(){
+  let id = location.hash.replace("#","") || "home";
+  if (!PAGES.some(p => p[0] === id)) id = "home";
+  document.querySelectorAll("section").forEach(s => s.hidden = s.id !== id);
+  document.querySelectorAll("#nav a").forEach(a => a.classList.toggle("on", a.dataset.p === id));
+  document.title = id === "home" ? "Victor Auberger" : `${PAGES.find(p=>p[0]===id)[1]} · Victor Auberger`;
+  window.scrollTo(0,0);
+  if (id === "home") drawChart();
+}
+window.addEventListener("hashchange", route);
+
+// ---------- Data ----------
+let rows = [], PRICES = { last:{}, series:[] };
+async function getJSON(url){ const r = await fetch(url + "?t=" + Date.now(), {cache:"no-store"}); if(!r.ok) throw r.status; return r.json(); }
+
+async function load(){
+  let positions = [];
+  try { positions = await getJSON("data/positions.json"); } catch(e){ console.warn("positions.json missing", e); }
+  try { PRICES = await getJSON("data/prices.json"); } catch(e){ console.warn("prices.json missing", e); }
+  const asOf = (PRICES.updated || new Date().toISOString()).slice(0,10);
+  rows = positions.map(p => {
+    const isOpen = p.exit == null || p.exit === "";
+    const px = isOpen ? (PRICES.last?.[p.ticker] ?? p.last ?? null) : p.exit;
+    const ret = px == null ? null : (p.side === "short" ? (p.entry - px) / p.entry : (px - p.entry) / p.entry);
+    return {...p, isOpen, px, ret, held: days(p.entryDate, isOpen ? asOf : p.exitDate)};
+  });
+  renderStats(); renderTable(); renderHoldings(); drawChart();
+  const upd = PRICES.updated ? new Date(PRICES.updated) : null;
+  const when = upd ? upd.toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "–";
+  const sample = PRICES.sample ? '<span class="sample">sample data</span>' : "";
+  $("#asof").innerHTML = `Open positions marked at the latest Yahoo Finance price (updated ${when}, delayed ~15 min). Short returns = (entry − exit) / entry.${sample}`;
+  $("#perfNote").innerHTML = `Equal-weighted across all positions since the first trade, in each stock's own currency. Updated ${when}.${sample}`;
+}
+
+// ---------- Home: open holdings ----------
+function renderHoldings(){
+  const open = rows.filter(r => r.isOpen).sort((a,b) => (b.ret??-9) - (a.ret??-9));
+  $("#holdings").innerHTML = open.map(r => `<li>
+    <span class="tick">${esc(r.ticker)}</span><span class="pill ${r.side}">${r.side.toUpperCase()}</span>
+    <span class="since">since ${fmtD(r.entryDate)}</span><span class="${cls(r.ret)}">${pct(r.ret)}</span></li>`).join("")
+    || `<li class="note">No open positions right now.</li>`;
+}
+
+// ---------- Home: performance chart (hand-drawn SVG, no library) ----------
+let range = "ALL";
+$("#ranges").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  range = b.dataset.r;
+  document.querySelectorAll("#ranges button").forEach(x => x.classList.toggle("on", x===b));
+  drawChart();
+});
+function sliceRange(series){
+  if (!series.length || range === "ALL") return series;
+  const end = new Date(series[series.length-1][0]); const from = new Date(end);
+  if (range === "1M") from.setMonth(from.getMonth()-1);
+  if (range === "3M") from.setMonth(from.getMonth()-3);
+  if (range === "1Y") from.setFullYear(from.getFullYear()-1);
+  if (range === "YTD") { from.setMonth(0); from.setDate(1); }
+  const i = Math.max(0, series.findIndex(d => new Date(d[0]) >= from) - 1);
+  const base = 1 + series[i][1];   // rebase so the window starts at 0%
+  return series.slice(i).map(([d,v]) => [d, (1+v)/base - 1]);
+}
+function niceStep(span){ const raw = span/4, mag = Math.pow(10, Math.floor(Math.log10(raw))); return [1,2,2.5,5,10].map(m=>m*mag).find(s => s >= raw); }
+
+function drawChart(){
+  const box = $("#chart"); if (!box || box.offsetParent === null) return;
+  const data = sliceRange(PRICES.series || []);
+  const tip = $("#tip");
+  box.querySelector("svg")?.remove();
+  if (data.length < 2){ $("#perfVal").textContent = "–"; return; }
+  const last = data[data.length-1][1];
+  $("#perfVal").textContent = pct(last); $("#perfVal").className = "perf-val " + cls(last);
+  $("#perfLbl").textContent = range === "ALL" ? `since ${fmtD(data[0][0])}` : range === "YTD" ? "year to date" : `last ${range.toLowerCase()}`;
+
+  const W = box.clientWidth, H = box.clientHeight, L = 46, R = 8, T = 10, B = 24;
+  const vals = data.map(d => d[1]);
+  let lo = Math.min(0, ...vals), hi = Math.max(0, ...vals);
+  const step = niceStep((hi - lo) || 0.01);
+  lo = Math.floor(lo/step)*step; hi = Math.ceil(hi/step)*step;
+  const t0 = +new Date(data[0][0]), t1 = +new Date(data[data.length-1][0]);
+  const x = d => L + (W-L-R) * ((+new Date(d) - t0) / ((t1 - t0) || 1));
+  const y = v => T + (H-T-B) * (1 - (v - lo) / ((hi - lo) || 1));
+
+  let g = "";
+  for (let v = lo; v <= hi + 1e-9; v += step){
+    g += `<line class="grid" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/>`;
+    g += `<text class="ax" x="${L-8}" y="${y(v)+4}" text-anchor="end">${pct(v, step < 0.01 ? 1 : 0)}</text>`;
+  }
+  // x labels: first, middle, last
+  [0, Math.floor(data.length/2), data.length-1].forEach((i,k) => {
+    const lab = new Date(data[i][0]).toLocaleDateString("en-GB",{month:"short", year:"2-digit"});
+    g += `<text class="ax" x="${x(data[i][0])}" y="${H-6}" text-anchor="${["start","middle","end"][k]}">${lab}</text>`;
+  });
+  const pts = data.map(d => `${x(d[0]).toFixed(1)},${y(d[1]).toFixed(1)}`);
+  const area = `M${x(data[0][0])},${y(0)} L${pts.join(" L")} L${x(data[data.length-1][0])},${y(0)} Z`;
+
+  box.insertAdjacentHTML("afterbegin", `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    ${g}<line class="zero" x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}"/>
+    <path class="area" d="${area}"/><polyline class="line" points="${pts.join(" ")}"/>
+    <line class="cross" id="cx" y1="${T}" y2="${H-B}" visibility="hidden"/>
+    <circle class="dot" id="cd" r="4.5" visibility="hidden"/>
+    <rect x="${L}" y="0" width="${W-L-R}" height="${H}" fill="transparent" id="hit"/>
+  </svg>`);
+
+  const svg = box.querySelector("svg"), cx = svg.querySelector("#cx"), cd = svg.querySelector("#cd");
+  const move = ev => {
+    const r = svg.getBoundingClientRect(), px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
+    const t = t0 + (px - L) / (W-L-R) * (t1 - t0);
+    let i = 0, best = Infinity;
+    data.forEach((d,k) => { const dd = Math.abs(+new Date(d[0]) - t); if (dd < best){ best = dd; i = k; } });
+    const X = x(data[i][0]), Y = y(data[i][1]);
+    cx.setAttribute("x1", X); cx.setAttribute("x2", X); cd.setAttribute("cx", X); cd.setAttribute("cy", Y);
+    cx.setAttribute("visibility","visible"); cd.setAttribute("visibility","visible");
+    tip.hidden = false;
+    tip.innerHTML = `${fmtD(data[i][0])} &nbsp;<b class="${cls(data[i][1])}">${pct(data[i][1])}</b>`;
+    tip.style.left = Math.min(Math.max(X - tip.offsetWidth/2, 0), W - tip.offsetWidth) + "px";
+    tip.style.top = Math.max(Y - 40, -8) + "px";
+  };
+  const leave = () => { tip.hidden = true; cx.setAttribute("visibility","hidden"); cd.setAttribute("visibility","hidden"); };
+  const hit = svg.querySelector("#hit");
+  hit.addEventListener("mousemove", move); hit.addEventListener("touchmove", move, {passive:true});
+  hit.addEventListener("mouseleave", leave); hit.addEventListener("touchend", leave);
+}
+let rsz; window.addEventListener("resize", () => { clearTimeout(rsz); rsz = setTimeout(drawChart, 120); });
+
+// ---------- Portfolio page ----------
+function renderStats(){
+  const closed = rows.filter(r => !r.isOpen);
+  const wins = closed.filter(r => r.ret > 0).length;
+  const avg = closed.length ? closed.reduce((s,r)=>s+r.ret,0)/closed.length : null;
+  $("#stats").innerHTML = [
+    [rows.length, "Positions"],
+    [rows.filter(r=>r.isOpen).length, "Open"],
+    [closed.length ? Math.round(wins/closed.length*100)+"%" : "–", "Hit rate (closed)"],
+    [`<span class="${cls(avg)}">${pct(avg)}</span>`, "Avg return (closed)"],
+  ].map(([v,l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+}
+
+let filter = "all", sortKey = "entryDate", sortDir = -1;
+const COLS = [
+  ["ticker","Ticker"],["side","Side"],["entryDate","Opened"],["entry","Entry",1],
+  ["exitDate","Closed"],["px","Exit / Last",1],["held","Days",1],["ret","Return",1]
+];
+function renderTable(){
+  let list = rows.filter(r => filter==="all" || (filter==="open"&&r.isOpen) || (filter==="closed"&&!r.isOpen) || r.side===filter);
+  list.sort((a,b) => { const x=a[sortKey], y=b[sortKey]; return (x>y?1:x<y?-1:0) * sortDir; });
+  const head = `<tr>${COLS.map(([k,l,n]) => `<th class="${n?'num':''}" data-k="${k}">${l}${sortKey===k?(sortDir>0?" ↑":" ↓"):""}</th>`).join("")}</tr>`;
+  const body = list.map(r => `<tr>
+    <td><span class="tick">${esc(r.ticker)}</span><span class="co">${esc(r.name)}</span>${r.thesis?`<span class="thesis">${esc(r.thesis)}</span>`:""}</td>
+    <td><span class="pill ${r.side}">${r.side.toUpperCase()}</span></td>
+    <td>${fmtD(r.entryDate)}</td>
+    <td class="num">${fmtP(r.entry)}</td>
+    <td>${r.isOpen ? '<span class="open">open</span>' : fmtD(r.exitDate)}</td>
+    <td class="num">${fmtP(r.px)}${r.isOpen?'<span class="co">last</span>':''}</td>
+    <td class="num">${r.held}</td>
+    <td class="num ${cls(r.ret)}">${pct(r.ret)}</td>
+  </tr>`).join("");
+  $("#pf").innerHTML = head + (body || `<tr><td colspan="8" class="open">No positions.</td></tr>`);
+  $("#pf").querySelectorAll("th").forEach(th => th.onclick = () => {
+    const k = th.dataset.k; sortDir = sortKey===k ? -sortDir : -1; sortKey = k; renderTable();
+  });
+}
+$("#filters").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  filter = b.dataset.f;
+  document.querySelectorAll("#filters button").forEach(x => x.classList.toggle("on", x===b));
+  renderTable();
+});
+
+// ---------- Research ----------
+$("#papers").innerHTML = PAPERS.map(p => `<article class="paper">
+  <h3>${esc(p.title)}</h3>
+  <div class="meta">${esc(p.authors)} · ${esc(p.venue)}, ${esc(p.year)}</div>
+  ${p.tags?.length ? `<div style="margin-top:6px">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>` : ""}
+  <details><summary>Abstract</summary><p>${esc(p.abstract)}</p></details>
+  <div class="links">
+    ${p.researchgate ? `<a href="${esc(p.researchgate)}" target="_blank" rel="noopener">ResearchGate ↗</a>` : ""}
+    ${p.pdf ? `<a href="${esc(p.pdf)}" download>Download PDF ↓</a>` : ""}
+  </div>
+</article>`).join("");
+
+// ---------- Recommendations ----------
+if (SHOW_RECS) {
+  $("#recsBody").innerHTML = Object.entries(RECS).map(([cat, items]) => `<h2>${esc(cat)}</h2><ul class="plain">${
+    items.map(i => `<li>${i.url ? `<a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.title)}</a>` : esc(i.title)}${i.note ? ` <span class="note">: ${esc(i.note)}</span>` : ""}</li>`).join("")
+  }</ul>`).join("");
+}
+
+route(); load();
+setInterval(load, 5 * 60 * 1000);   // re-check for fresh prices every 5 minutes while the page is open
+</script>
+</body>
+</html>
