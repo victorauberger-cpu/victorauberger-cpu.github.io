@@ -1,7 +1,6 @@
 [
-  {"ticker": "AAPL",   "name": "Apple",        "side": "long",  "entryDate": "2025-02-10", "entry": 227.65, "exitDate": "2025-09-15", "exit": 236.70, "thesis": "Services margin mix"},
-  {"ticker": "MC.PA",  "name": "LVMH",         "side": "long",  "entryDate": "2025-04-14", "entry": 498.00, "exitDate": "",           "exit": null,   "thesis": "China demand bottoming"},
-  {"ticker": "TSLA",   "name": "Tesla",        "side": "short", "entryDate": "2025-03-03", "entry": 284.65, "exitDate": "2025-04-21", "exit": 227.50, "thesis": "Delivery miss"},
-  {"ticker": "ASML",   "name": "ASML Holding", "side": "long",  "entryDate": "2025-06-02", "entry": 745.00, "exitDate": "2025-08-04", "exit": 705.00, "thesis": "Export-control overhang priced in"},
-  {"ticker": "KER.PA", "name": "Kering",       "side": "short", "entryDate": "2025-07-01", "entry": 190.00, "exitDate": "",           "exit": null,   "thesis": "Gucci turnaround too slow"}
+  {"ticker": "BIRK", "name": "Birkenstock",  "side": "long", "entryDate": "2026-11-03", "entry": 35.40,  "exitDate": "", "exit": null, "thesis": ""},
+  {"ticker": "LDOS", "name": "Leidos",       "side": "long", "entryDate": "2026-11-03", "entry": 134.52, "exitDate": "", "exit": null, "thesis": ""},
+  {"ticker": "PFE",  "name": "Pfizer",       "side": "long", "entryDate": "2026-11-03", "entry": 29.92,  "exitDate": "", "exit": null, "thesis": ""},
+  {"ticker": "T",    "name": "AT&T",         "side": "long", "entryDate": "2026-11-03", "entry": 21.32,  "exitDate": "", "exit": null, "thesis": ""}
 ]

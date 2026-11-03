@@ -7,6 +7,7 @@
 | Your trades (add, close, remove) | `data/positions.json` |
 | Bio, contact links, page text | `index.html` (the HTML near the top) |
 | Research papers, recommendations | `index.html` (the block marked `EDIT YOUR CONTENT HERE`) |
+| Benchmark (S&P 500) and its start level | `data/settings.json` |
 | Paper PDFs | upload them into the `papers/` folder, e.g. `papers/paper-1.pdf` |
 
 **Don't edit** `data/prices.json`. It's rewritten automatically from Yahoo Finance.

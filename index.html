@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Victor Auberger</title>
-<meta name="description" content="Victor Auberger: student at ESCP Business School. Portfolio, research and contact.">
+<meta name="description" content="Victor Auberger: ESCP Business School graduate in Paris. Live investment portfolio, research papers and contact.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#fbfaf7; --ink:#1b1b1a; --muted:#6d6b66; --faint:#e7e4dd; --card:#ffffff;
-    --accent:#1f4d8f; --up:#18794e; --down:#c0392b;
+    --accent:#1f4d8f; --bench:#a19d94; --up:#18794e; --down:#c0392b;
     --serif:"Newsreader", Georgia, "Times New Roman", serif;
     --mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   @media (prefers-color-scheme: dark){
     :root{ --bg:#141413; --ink:#ecebe7; --muted:#9a978f; --faint:#2b2a27; --card:#1b1b19;
-           --accent:#8db4ff; --up:#4cc38a; --down:#ff7b6b; }
+           --accent:#8db4ff; --bench:#6f6c66; --up:#4cc38a; --down:#ff7b6b; }
   }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--ink)}
@@ -59,7 +59,7 @@
   .long{color:var(--up)} .short{color:var(--down)}
   .up{color:var(--up)} .down{color:var(--down)}
   .open{color:var(--muted);font-style:italic}
-  .thesis{display:block;font-family:var(--serif);font-size:14px;color:var(--muted);white-space:normal;min-width:130px;max-width:190px;margin-top:2px}
+  .thesis{font-family:var(--serif);font-size:14px;color:var(--muted);white-space:normal;min-width:120px;max-width:200px}
 
   /* Home performance chart */
   .small{font-size:14px}
@@ -73,9 +73,14 @@
   .chart .ax{font-family:var(--mono);font-size:11px;fill:var(--muted)}
   .chart .line{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
   .chart .area{fill:var(--accent);opacity:.07}
+  .chart .bench{fill:none;stroke:var(--bench);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+  .chart .elab{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+  .chart .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 20px;border:1px dashed var(--faint);border-radius:8px;color:var(--muted);font-size:15px}
+  .legend{display:flex;gap:16px;font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:4px}
+  .legend i{display:inline-block;width:14px;height:2px;border-radius:1px;vertical-align:middle;margin-right:6px}
   .chart .cross{stroke:var(--muted);stroke-width:1}
   .chart .dot{fill:var(--accent);stroke:var(--bg);stroke-width:2}
-  .tip{position:absolute;top:0;pointer-events:none;background:var(--card);border:1px solid var(--faint);border-radius:6px;padding:5px 9px;font-family:var(--mono);font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .tip{position:absolute;top:0;pointer-events:none;line-height:1.5;background:var(--card);border:1px solid var(--faint);border-radius:6px;padding:5px 9px;font-family:var(--mono);font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.06)}
   .tip b{font-weight:500}
   .holdings li{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:14px}
   .holdings li::before{display:none}
@@ -87,6 +92,7 @@
   .paper{border-top:1px solid var(--faint);padding:22px 0}
   .paper:first-of-type{border-top:none;padding-top:4px}
   .paper h3{font-weight:500;font-size:21px;line-height:1.35;margin:0 0 4px}
+  .psub{font-size:17px;color:var(--muted);margin:-2px 0 6px;line-height:1.4}
   .meta{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
   details{margin:10px 0 12px}
   summary{cursor:pointer;font-family:var(--mono);font-size:13px;color:var(--muted)}
@@ -113,18 +119,22 @@
 
   <header>
     <h1>Victor Auberger</h1>
-    <p class="sub">Student, ESCP Business School</p>
+    <p class="sub">BSc in Management, ESCP Business School · Paris</p>
     <nav id="nav"></nav>
   </header>
 
   <!-- ================= HOME ================= -->
   <section id="home">
     <h2>Bio</h2>
-    <p>I'm a student at ESCP Business School. I'm interested in equity research, markets and corporate finance. I write research papers on the side and track my own investment ideas, long and short, on the <a href="#portfolio">portfolio</a> page.</p>
+    <p>I'm a graduate of the Bachelor of Science in Management at ESCP Business School, currently applying to Master's programmes in finance. On the side, I invest in equities, commodities and derivatives to sharpen my investment skills and deepen my understanding of markets. My positions are tracked live on the <a href="#portfolio">portfolio</a> page.</p>
+    <p>I've interned in tech, real estate and, most recently, asset management, and held tutoring, research and analysis roles throughout my undergrad. I write <a href="#research">research</a> on markets, finance and whatever else catches my curiosity. Based in Paris.</p>
 
     <h2>Current portfolio</h2>
     <div class="perf-head">
-      <div><span id="perfVal" class="perf-val">–</span> <span id="perfLbl" class="note"></span></div>
+      <div>
+        <div><span id="perfVal" class="perf-val">–</span> <span id="perfLbl" class="note"></span></div>
+        <div class="legend" id="legend"></div>
+      </div>
       <div class="filters" id="ranges">
         <button data-r="1M">1M</button><button data-r="3M">3M</button><button data-r="YTD">YTD</button>
         <button data-r="1Y">1Y</button><button data-r="ALL" class="on">All</button>
@@ -138,9 +148,9 @@
     <h2>Elsewhere</h2>
     <ul class="plain">
       <li><a href="#research">Research</a></li>
-      <li><a href="https://x.com/YOUR_HANDLE">X / Twitter</a></li>
-      <li><a href="https://www.linkedin.com/in/YOUR_PROFILE">LinkedIn</a></li>
-      <li><a href="#contact">Email</a></li>
+      <li><a href="https://x.com/victor_auberger">X / Twitter</a></li>
+      <li><a href="https://www.linkedin.com/in/victor-auberger-853115293/">LinkedIn</a></li>
+      <li><a href="mailto:victor.auberger@edu.escp.eu">Email</a></li>
     </ul>
   </section>
 
@@ -176,9 +186,9 @@
     <h2>Contact</h2>
     <p>The easiest way to reach me is by email. I'm happy to talk about markets, research, or anything on this site.</p>
     <dl class="contact">
-      <dt>Email</dt><dd><a href="mailto:you@example.com">you@example.com</a></dd>
-      <dt>X</dt><dd><a href="https://x.com/YOUR_HANDLE">@YOUR_HANDLE</a></dd>
-      <dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/YOUR_PROFILE">linkedin.com/in/YOUR_PROFILE</a></dd>
+      <dt>Email</dt><dd><a href="mailto:victor.auberger@edu.escp.eu">victor.auberger@edu.escp.eu</a></dd>
+      <dt>X</dt><dd><a href="https://x.com/victor_auberger">@victor_auberger</a></dd>
+      <dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/victor-auberger-853115293/">linkedin.com/in/victor-auberger</a></dd>
     </dl>
   </section>
 
@@ -193,41 +203,128 @@
 
 const SHOW_RECS = true;   // set to false to hide the Recommendations page
 
-// ⚠ SAMPLE DATA: replace with your papers.
-// researchgate: link to the paper's ResearchGate page. pdf: path to a PDF you put in the papers/ folder.
+// Your papers, newest first. abstract: paragraphs separated by a blank line (\n\n). pdf: a file in the papers/ folder.
+// Leave researchgate, abstract or pdf as "" to hide that part.
 const PAPERS = [
   {
-    title:"[Paper title]: e.g. Momentum and Earnings Surprises in European Mid-Caps",
-    authors:"Victor Auberger, [Co-author]",
-    venue:"Working paper", year:2026, tags:["Asset pricing"],
-    abstract:"[Paste your abstract here.] One or two paragraphs summarising the question, the data, the method and the main finding.",
-    researchgate:"https://www.researchgate.net/publication/XXXXXXXX",
-    pdf:"papers/paper-1.pdf"
+    title: "Betting on Everything: Should States Allow Prediction Markets?",
+    subtitle: "A policy review of Kalshi, Polymarket and their rivals: what the boom of 2025–2026 reveals about our societies, what the markets are useful for, where they cause harm, and how they should be regulated",
+    authors: "Victor Auberger",
+    date: "October 2026",
+    pages: 44,
+    tags: ["Prediction markets", "Regulation"],
+    abstract: "In eighteen months, prediction markets went from a curiosity to an industry. Monthly trading on Kalshi and Polymarket rose from $2.8 billion in January 2025 to $53 billion in July 2026; Kalshi is valued at $40 billion and Polymarket at $21 billion; the NBA, Robinhood and the owner of the New York Stock Exchange have joined in. At the same time, a soldier has been charged with betting on a military raid he took part in, a journalist received death threats from traders who wanted a different settlement, and about twenty states are fighting the platforms in court.\n\nThis paper asks whether states should allow prediction markets and, if so, under which rules. It reviews the economic and legal literature, describes the platforms' mechanics, valuations and structure, and uses the author's dataset of every Kalshi market from 2021 to October 2026 to show what people actually bet on. It then tests seven claims made for prediction markets on the scale used in the author's earlier review of hedge-fund policy (Holds, Holds in part, Does not hold).\n\nThe answer is a qualified yes. Prediction markets on economic, political, scientific and weather questions produce useful, well-calibrated forecasts, and their best contracts deserve a light regime. But about four-fifths of the volume (79% in July 2026) is sports betting under another name, and the claim that these contracts are hedging instruments does not survive the evidence. The paper proposes a six-layer regime: regulate contracts by what they are about rather than by who lists them; a statutory insider-trading rule and identity checks; listing rules that exclude acts of violence, military operations and single-person outcomes; no margin for retail event contracts; honest marketing with a published share of losing accounts; and equal taxes and age limits for sports contracts. Allowed on these terms, prediction markets can become what their supporters promise: machines for discovering the truth, rather than casinos with better branding.",
+    researchgate: "https://www.researchgate.net/publication/417268122",
+    pdf: "papers/Auberger_Victor_PredictionMarketsPolicy_2026.pdf",
   },
   {
-    title:"[Second paper title]",
-    authors:"Victor Auberger",
-    venue:"ESCP Business School, Master's thesis", year:2025, tags:["Corporate finance"],
-    abstract:"[Paste your abstract here.]",
-    researchgate:"https://www.researchgate.net/publication/XXXXXXXX",
-    pdf:"papers/paper-2.pdf"
+    title: "The House Edge Without a House: Insurance for Gamblers",
+    subtitle: "A pre-registered test of whether a fund can profit by selling longshot bets on Kalshi and Polymarket, and of what crash insurance from the same markets costs a stock portfolio",
+    authors: "Victor Auberger",
+    date: "October 2026",
+    pages: 43,
+    tags: ["Prediction markets", "Market making", "Pre-registered"],
+    abstract: "People who buy cheap longshot contracts on prediction markets lose money: on Kalshi, buyers of contracts priced at ten cents or less lose close to half of their stake. This paper asks whether a fund could take the other side of those bets, as a bookmaker would, and whether the same markets can insure a stock portfolio. The plan, hypotheses and tests were fixed before the data were examined. Part A uses 148,939 Kalshi longshots in 52,731 events from July 2021 to October 2026 and 23,911 Polymarket longshots from March 2023 to January 2026. A taker who buys “No” on every contract priced at one to ten cents a day before the close earns at most +0.06% per dollar on Kalshi after fees (95% interval [−0.05%, 0.17%]), an upper bound because it assumes buying at the last traded price; paying one cent more gives −0.97%. On Polymarket it loses 1.56%. The bias is real, but it is collected by makers: Kalshi makers who sold longshots earned +1.89%, 1.57 points more than takers. An exploratory split finds a taker edge only in liquid markets, and a fund trading it invested about 1% of its capital on an average day.\n\nPart B treats crash insurance as a longshot. A one-day contract bundle on Kalshi's S&P 500 and Nasdaq-100 ranges, paying $1 if the index closes more than 1% below the market's forecast, cost 28.5 cents and paid out on 8.6% of 291 index-days: buyers lost 70% per dollar. The insurance pays when stocks fall, but it lowers a stock portfolio's Sharpe ratio and does not measurably reduce its worst days. Prediction markets reward whoever plays the house; on these platforms, a fund can be that house only at the margin.",
+    researchgate: "https://www.researchgate.net/publication/417268121",
+    pdf: "papers/Auberger_Victor_HouseEdge_2026.pdf",
+  },
+  {
+    title: "Do Volatility-Managed Portfolios Survive Out of Sample?",
+    subtitle: "A pre-registered replication and real-time test of Moreira and Muir (2017), using the Kenneth French Data Library",
+    authors: "Victor Auberger",
+    date: "September 2026",
+    pages: 37,
+    tags: ["Asset pricing", "Replication", "Pre-registered"],
+    abstract: "Volatility-managed portfolios, which reduce exposure to a factor after volatile months and increase it after calm months, were reported by Moreira and Muir (2017) to earn large abnormal returns across most equity factors. Motivated by the argument of Ioannidis (2005) that most published research findings are false, this study subjects the result to a pre-registered replication and out-of-sample test. The hypotheses, tests, decision rules, a power analysis and a grid of 288 robustness specifications were fixed before any data were downloaded. Using the free Kenneth French Data Library, the original results are reproduced almost exactly, with every alpha within half a standard error of its published value. On the 127 months from January 2016 to July 2026, however, no spanning alpha remains significantly positive, and the alpha of managed momentum falls from 12.80% to 0.51% per year, a decline that survives, narrowly, a post-hoc adjustment for the smaller positions the strategy held after 2016. The pre-registered rule also classifies the alphas of profitability and value as significantly smaller, but on a risk-adjusted basis these declines are not significant. For an investor implementing the strategy in real time, the pre-registered primary test, the Sharpe ratio gain of managed momentum after 10 basis points of trading costs, is +0.03 (95% confidence interval −0.32 to +0.39, p = 0.45). The point estimates for the other five factors are negative, but no Sharpe ratio gain is significantly below its pre-2016 value, and the primary test has a power of only about 18% against a gain of the pre-2016 size. At the same time, 26 of the 48 momentum specifications appear significant by the pre-registered p-value, all with longer variance windows than pre-registered, although they amount to four distinct strategies and only 10 have a 95% confidence interval that excludes zero. This shows how choices made after seeing the data could have produced a spurious confirmation. The results suggest that the historical advantage of volatility management was concentrated in rare crash episodes and could only partly be captured in real time.",
+    researchgate: "https://www.researchgate.net/publication/415165209",
+    pdf: "papers/Auberger_Victor_VolatilityManagedPortfolios_2026.pdf",
+  },
+  {
+    title: "Les États doivent-ils encourager les hedge funds ? Retour sur la conclusion de More Money Than God",
+    subtitle: "Une analyse critique de la performance, du rôle sur les marchés, du risque systémique et de la régulation des hedge funds, de 1949 à 2026",
+    authors: "Victor Auberger",
+    date: "August 2026",
+    pages: 56,
+    tags: ["Hedge funds", "Regulation", "In French"],
+    abstract: "Dans More Money Than God (2010), Sebastian Mallaby soutient que les États devraient encourager les hedge funds, parce qu'ils sont assez petits pour faire faillite, mieux gérés et plus liquides que les banques d'investissement, dirigés par des gérants qui investissent leur propre argent, et utiles aux marchés en ramenant les prix vers leur juste valeur. Cet article confronte chacune de ces thèses aux travaux académiques et officiels disponibles au 31 mai 2026 et aux événements survenus jusqu'en août 2026, notamment le rachat par Citadel du portefeuille à effet de levier de Situational Awareness en juillet 2026. Il montre que chaque thèse ne tient qu'en partie. Aucun hedge fund n'a jamais bénéficié d'un sauvetage aux frais du contribuable, et l'affaire Situational Awareness a été résolue par des acteurs privés, comme le prévoit le modèle de Mallaby. Les hedge funds améliorent aussi la formation des prix et la liquidité en temps normal. Mais le secteur dépasse désormais 5 200 milliards de dollars, emprunte près de 3 000 milliards sur les marchés de la pension livrée (repo), pour l'essentiel sans décote, et se concentre dans quelques plateformes qui dépassent les propres seuils de Mallaby pour une surveillance de type bancaire. Les gérants ont prélevé environ la moitié des gains bruts en commissions : 100 $ investis début 2008 seraient devenus 226 $ dans les hedge funds, contre environ 355 $ avant frais et 660 $ dans le S&P 500, car perdre moins lors des krachs ne compense ni l'écart de rendement avec les actions ni le coût des frais. La croissance du secteur s'explique surtout par la composition de rendements positifs et par une demande de protection plutôt que de rendement ; dans les données publiques, les plus grands fonds offrent deux fois moins de risque que le fonds moyen, mais pas davantage de rendement, et les gérants les plus performants restent largement inaccessibles. Par ailleurs, les fonds endettés se sont comportés en suiveurs de tendance et en vendeurs forcés lors des périodes de tension, ce qui a exigé l'intervention de la banque centrale en mars 2020. L'article conclut que les États devraient encourager les hedge funds en tant que preneurs de risque indépendants et susceptibles de faire faillite, mais réguler le levier qui leur est fourni, mesurer leur importance systémique par leur exposition brute, tarifer tout filet de sécurité des banques centrales et tenir les hedge funds à l'écart des options de retraite par défaut des épargnants ordinaires. Il montre enfin que l'accès direct, réservé aux ménages fortunés parce que ces fonds exigent un capital patient, crée une inégalité réelle mais plus étroite qu'il n'y paraît, qui appelle un accès collectif plutôt qu'une ouverture de chaque fonds au grand public.",
+    researchgate: "https://www.researchgate.net/publication/414884045",
+    pdf: "papers/Auberger_Victor_HedgeFundPolicy_2026_FR.pdf",
+  },
+  {
+    title: "Picking Up Nickels in Front of a Steamroller: Could LTCM's Risk Model Have Seen 1998 Coming?",
+    subtitle: "A pre-registered backtest of value-at-risk models on synthetic Long-Term Capital Management trades, 1995–2025",
+    authors: "Victor Auberger",
+    date: "August 2025",
+    pages: 36,
+    tags: ["Risk management", "Hedge funds", "Pre-registered"],
+    abstract: "Long-Term Capital Management (LTCM) measured risk with volatilities and correlations estimated from recent history and treated returns as approximately normal. This study asks whether a risk model of that kind would have warned of the 1998 losses on LTCM-style trades. Three characteristic trades, short equity volatility, credit convergence and liquidity convergence, are rebuilt from free public data and combined into an equal-risk portfolio targeting 15% annual volatility. Five risk models, from a normal model estimated on five years of data to GARCH-t filtered historical simulation and extreme value theory, forecast the portfolio's one-day value-at-risk on 7,654 trading days from January 1995 to May 2025. The hypotheses, tests, decision rules, a power analysis and 180 robustness specifications were fixed in a pre-registration plan before any results were computed; the few later changes are reported. The LTCM-style model is exceeded on 173 days where 77 were expected (2.26% against 1%), its exceedances cluster, and the primary pre-registered backtest rejects it (p < 0.001). Between the Russian default and the week after the rescue, the portfolio lost 25.7% of its capital; the worst day was an 8.9 standard-deviation loss, and the model gave the cumulative loss a probability below one in a million, although its own estimation window contained a larger one-day loss. Better models help but none of the pre-registered ones passes: GARCH-t filtered historical simulation comes closest, at 1.23%, but is narrowly rejected by the pre-registered one-sided test, while a GARCH model with an extreme-value tail, added after the results were seen, passes the 99% VaR backtest, though not the 95% one. All models understate the size of losses beyond the VaR. Correlations between the trades rose from 0.05 to 0.42 in 1998, an increase that survives a post-hoc adjustment for higher volatility, but not in 2008 or 2020, when they were already moderately positive. The portfolio reproduces LTCM's losses in August and September 1998 but not in May and June, so the results describe the market-wide crash in LTCM-style exposures rather than the fund's whole book.",
+    researchgate: "https://www.researchgate.net/publication/415164768",
+    pdf: "papers/Auberger_Victor_LTCM_RiskModel_2025.pdf",
+  },
+  {
+    title: "Do Hedge Funds Still Hedge? A Pre-Registered Out-of-Sample Test of Asness, Krail and Liew (2001)",
+    subtitle: "A replication and 20-year out-of-sample study of stale prices and hidden market exposure in hedge fund indices",
+    authors: "Victor Auberger",
+    date: "February 2025",
+    pages: 27,
+    tags: ["Hedge funds", "Replication", "Pre-registered"],
+    abstract: "Asness, Krail and Liew (2001) showed that hedge funds hedge much less than simple statistics suggest: because many funds hold illiquid or hard-to-price assets, their reported returns react to market moves with a delay, and adding lagged market returns to a regression more than doubled the market beta of the aggregate hedge fund index and turned its alpha negative. This study tests whether that conclusion still holds, using a pre-registered design in which the hypotheses, decision rules, a power analysis and 144 robustness specifications were fixed before any regression was run. With the free EDHEC hedge fund style indices and the market factor of the Kenneth French Data Library, the original result replicates for January 1997 to September 2000: the lagged beta of an equal-weighted composite is 0.20 (p = 0.001) and triples its measured market exposure. In the 248 months from October 2000 to May 2021, the primary out-of-sample test also supports the hypothesis, but the effect is much smaller: the lagged beta is 0.057 (p = 0.009), raising the measured beta from 0.14 to 0.20, and it is significant in 127 of the 144 specifications. The lag is concentrated in illiquid strategies, such as distressed securities and fixed-income arbitrage, and is also present in the Barclay Hedge Fund Index in 2022–2024. Unlike in the original study, however, the lag does not remove hedge fund alpha over the full period, and it is larger after rising markets than after falling ones. Hedge funds hedge more than they did before 2000, but still less than their reported returns suggest.",
+    researchgate: "",
+    pdf: "papers/Auberger_Victor_HedgeFunds_2025.pdf",
+  },
+  {
+    title: "Forget Miltank: A Quantitative Search for the Best Team in Pokémon HeartGold and SoulSilver",
+    subtitle: "A simulation study of 34 story battles, 219 obtainable Pokémon and every repeatable source of experience in Johto and Kanto",
+    authors: "Victor Auberger",
+    date: "June 2023",
+    pages: 33,
+    tags: ["Simulation", "Just for fun"],
+    abstract: "Pokémon HeartGold and SoulSilver are, underneath, entirely quantitative games: every battle is resolved by fixed formulas for stats, damage, experience and catch rates. This study uses those formulas to answer a question every player has asked: what is the best team to beat the whole game, where do you catch it, what should it know and hold, and how do you train it fastest? All data are read from the fan decompilation of the game's code, covering all 738 trainers, every wild encounter table and the location of every TM and held item, and battles are simulated with Pokémon Showdown's Generation 4 engine. Only Pokémon obtainable in a single cartridge, without trading, legendaries or events, are allowed. After an analytic screen of about 110 evolutionary lines and full simulations of the most promising teams, the 15 finalists are played through the 34 story battles in order, with only the moves, single-use TMs and held items they could really have at each point, and a level that never goes down. A core of Graveler, Heracross, Umbreon and Lapras appears in almost every good team. The best team, Feraligatr, Arcanine, Graveler, Heracross, Lapras and Umbreon, is complete before Chuck and never needs to be above an opponent's level until the Elite Four, which it must enter at level 54, four levels above Lance's strongest Pokémon; without held items it would need level 57. It beats Whitney one level below her Miltank, which is hard mainly for a starter fighting alone. Red requires a separate team built around Blissey, Tyranitar, Steelix and Tentacruel, trained to level 84, and the fastest way to get there is the Elite Four rematch, which gives about 75% more experience per minute than Mt. Silver. The complete plan, with every member's moves and held item in every battle, is given in an appendix.",
+    researchgate: "https://www.researchgate.net/publication/414775337",
+    pdf: "papers/Auberger_Victor_Pokemon_HGSS_2023.pdf",
+  },
+  {
+    title: "Determinants of Market Value and Transfer Fee Deviations in European Football",
+    subtitle: "A two-stage quantitative analysis of player pricing in the top 5 leagues",
+    authors: "Victor Auberger",
+    date: "",
+    pages: null,
+    tags: ["Sports economics", "Econometrics"],
+    abstract: "",
+    researchgate: "https://www.researchgate.net/publication/414718800",
+    pdf: "",
   },
 ];
-
 // Recommendations (optional page). Add or remove categories freely.
 const RECS = {
-  "Listening": [ {title:"[Album / artist]", url:"", note:"one-line comment"} ],
-  "Reading":   [ {title:"[Book], [Author]", url:"", note:"why it's worth it"} ],
-  "Watching":  [ {title:"[Film or series]", url:"", note:""} ],
-  "Playing":   [ {title:"[Game]", url:"", note:""} ],
+  "Listening": [
+    {title:"Whole Lotta Red, Playboi Carti", url:"https://music.apple.com/us/album/1546163603", note:""},
+    {title:"Shine Forever, Lil Shine",      url:"https://open.spotify.com/search/Lil%20Shine%20Shine%20Forever", note:""},
+    {title:"Nevermind, Nirvana",            url:"https://open.spotify.com/search/Nirvana%20Nevermind", note:""},
+  ],
+  "Watching": [
+    {title:"Blade Runner 2049", url:"https://www.youtube.com/results?search_query=Blade+Runner+2049+official+trailer", note:""},
+    {title:"Taxi Driver",       url:"https://www.youtube.com/results?search_query=Taxi+Driver+1976+official+trailer", note:""},
+    {title:"Shutter Island",    url:"https://www.youtube.com/watch?v=YDGldPitxic", note:""},
+  ],
+  "Reading": [
+    {title:"More Money Than God, Sebastian Mallaby", url:"https://open.spotify.com/search/More%20Money%20Than%20God%20Sebastian%20Mallaby", note:""},
+    {title:"The Great Gatsby, F. Scott Fitzgerald",  url:"https://open.spotify.com/search/The%20Great%20Gatsby%20F.%20Scott%20Fitzgerald", note:""},
+    {title:"Into the Wild, Jon Krakauer",            url:"https://open.spotify.com/search/Into%20the%20Wild%20Jon%20Krakauer", note:""},
+  ],
+  "Playing": [
+    {title:"The Legend of Zelda: Breath of the Wild", url:"https://www.youtube.com/results?search_query=Zelda+Breath+of+the+Wild+official+trailer", note:""},
+    {title:"EA Sports FC 27",                         url:"https://www.youtube.com/results?search_query=EA+Sports+FC+27+official+trailer", note:""},
+    {title:"Pokémon HeartGold & SoulSilver",          url:"https://www.youtube.com/results?search_query=Pokemon+HeartGold+SoulSilver+trailer", note:""},
+  ],
 };
 
 /* ===================================================================== */
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const pct = (v, d=1) => v == null || isNaN(v) ? "–" : (v>0?"+":v<0?"−":"") + Math.abs(v*100).toFixed(d) + "%";
-const cls = v => v > 0 ? "up" : v < 0 ? "down" : "";
+const pct = (v, d=1) => { if (v == null || isNaN(v)) return "–"; const r = +(v*100).toFixed(d); return (r>0?"+":r<0?"−":"") + Math.abs(r).toFixed(d) + "%"; };
+const cls = (v, d=1) => { const t = 0.5 * Math.pow(10, -d) / 100; return v >= t ? "up" : v <= -t ? "down" : ""; };
 const fmtP = n => n == null ? "–" : Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtD = d => d ? new Date(d.slice(0,10)+"T00:00:00").toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) : "";
 const days = (a,b) => Math.round((new Date(b) - new Date(a)) / 864e5);
@@ -267,7 +364,7 @@ async function load(){
   const when = upd ? upd.toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "–";
   const sample = PRICES.sample ? '<span class="sample">sample data</span>' : "";
   $("#asof").innerHTML = `Open positions marked at the latest Yahoo Finance price (updated ${when}, delayed ~15 min). Short returns = (entry − exit) / entry.${sample}`;
-  $("#perfNote").innerHTML = `Equal-weighted across all positions since the first trade, in each stock's own currency. Updated ${when}.${sample}`;
+  $("#perfNote").innerHTML = `Equal-weighted across all positions since inception, in each stock's own currency, against the S&P 500. Updated ${when}.${sample}`;
 }
 
 // ---------- Home: open holdings ----------
@@ -295,27 +392,38 @@ function sliceRange(series){
   if (range === "1Y") from.setFullYear(from.getFullYear()-1);
   if (range === "YTD") { from.setMonth(0); from.setDate(1); }
   const i = Math.max(0, series.findIndex(d => new Date(d[0]) >= from) - 1);
-  const base = 1 + series[i][1];   // rebase so the window starts at 0%
-  return series.slice(i).map(([d,v]) => [d, (1+v)/base - 1]);
+  const b1 = 1 + series[i][1], b2 = 1 + (series[i][2] ?? 0);   // rebase so the window starts at 0%
+  return series.slice(i).map(([d,v,w]) => [d, (1+v)/b1 - 1, w == null ? null : (1+w)/b2 - 1]);
 }
 function niceStep(span){ const raw = span/4, mag = Math.pow(10, Math.floor(Math.log10(raw))); return [1,2,2.5,5,10].map(m=>m*mag).find(s => s >= raw); }
 
 function drawChart(){
   const box = $("#chart"); if (!box || box.offsetParent === null) return;
   const data = sliceRange(PRICES.series || []);
+  const hasB = data.some(d => d[2] != null);
+  const bName = PRICES.benchmarkName || "S&P 500";
   const tip = $("#tip");
-  box.querySelector("svg")?.remove();
-  if (data.length < 2){ $("#perfVal").textContent = "–"; return; }
-  const last = data[data.length-1][1];
-  $("#perfVal").textContent = pct(last); $("#perfVal").className = "perf-val " + cls(last);
-  $("#perfLbl").textContent = range === "ALL" ? `since ${fmtD(data[0][0])}` : range === "YTD" ? "year to date" : `last ${range.toLowerCase()}`;
+  box.querySelector("svg")?.remove(); box.querySelector(".empty")?.remove();
+  $("#legend").innerHTML = `<span><i style="background:var(--accent)"></i>Portfolio</span>` + (hasB ? `<span><i style="background:var(--bench)"></i>${esc(bName)}</span>` : "");
+  if (!data.length){ $("#perfVal").textContent = "–"; return; }
 
-  const W = box.clientWidth, H = box.clientHeight, L = 46, R = 8, T = 10, B = 24;
-  const vals = data.map(d => d[1]);
+  const last = data[data.length-1];
+  $("#perfVal").textContent = pct(last[1], 2); $("#perfVal").className = "perf-val " + cls(last[1], 2);
+  const since = range === "ALL" ? `since ${fmtD(data[0][0])}` : range === "YTD" ? "year to date" : `last ${range.toLowerCase()}`;
+  $("#perfLbl").textContent = since + (hasB && last[2] != null ? ` · ${bName} ${pct(last[2], 2)}` : "");
+
+  const daysSpan = (new Date(last[0]) - new Date(data[0][0])) / 864e5;
+  if (daysSpan < 2){
+    box.insertAdjacentHTML("afterbegin", `<div class="empty">Portfolio opened ${fmtD(data[0][0])}. The chart fills in as trading days go by.</div>`);
+    return;
+  }
+
+  const W = box.clientWidth, H = box.clientHeight, L = 46, R = hasB ? 78 : 8, T = 10, B = 24;
+  const vals = data.flatMap(d => [d[1], d[2]]).filter(v => v != null);
   let lo = Math.min(0, ...vals), hi = Math.max(0, ...vals);
   const step = niceStep((hi - lo) || 0.01);
   lo = Math.floor(lo/step)*step; hi = Math.ceil(hi/step)*step;
-  const t0 = +new Date(data[0][0]), t1 = +new Date(data[data.length-1][0]);
+  const t0 = +new Date(data[0][0]), t1 = +new Date(last[0]);
   const x = d => L + (W-L-R) * ((+new Date(d) - t0) / ((t1 - t0) || 1));
   const y = v => T + (H-T-B) * (1 - (v - lo) / ((hi - lo) || 1));
 
@@ -324,17 +432,30 @@ function drawChart(){
     g += `<line class="grid" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/>`;
     g += `<text class="ax" x="${L-8}" y="${y(v)+4}" text-anchor="end">${pct(v, step < 0.01 ? 1 : 0)}</text>`;
   }
-  // x labels: first, middle, last
+  const short = daysSpan < 120;
   [0, Math.floor(data.length/2), data.length-1].forEach((i,k) => {
-    const lab = new Date(data[i][0]).toLocaleDateString("en-GB",{month:"short", year:"2-digit"});
+    const lab = new Date(data[i][0]).toLocaleDateString("en-GB", short ? {day:"numeric", month:"short"} : {month:"short", year:"2-digit"});
     g += `<text class="ax" x="${x(data[i][0])}" y="${H-6}" text-anchor="${["start","middle","end"][k]}">${lab}</text>`;
   });
   const pts = data.map(d => `${x(d[0]).toFixed(1)},${y(d[1]).toFixed(1)}`);
-  const area = `M${x(data[0][0])},${y(0)} L${pts.join(" L")} L${x(data[data.length-1][0])},${y(0)} Z`;
+  const bpts = data.filter(d => d[2] != null).map(d => `${x(d[0]).toFixed(1)},${y(d[2]).toFixed(1)}`);
+  const area = `M${x(data[0][0])},${y(0)} L${pts.join(" L")} L${x(last[0])},${y(0)} Z`;
+
+  // end-of-line labels, nudged apart if they would overlap
+  let endLabels = "";
+  if (hasB && last[2] != null){
+    let yp = y(last[1]), yb = y(last[2]);
+    if (Math.abs(yp - yb) < 14){ const m = (yp + yb)/2, up = yp <= yb ? -1 : 1; yp = m + up*7; yb = m - up*7; }
+    endLabels = `<text class="elab" x="${W-R+8}" y="${yp+4}" style="fill:var(--accent)">Portfolio</text>
+                 <text class="elab" x="${W-R+8}" y="${yb+4}">${esc(bName)}</text>`;
+  }
 
   box.insertAdjacentHTML("afterbegin", `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
     ${g}<line class="zero" x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}"/>
-    <path class="area" d="${area}"/><polyline class="line" points="${pts.join(" ")}"/>
+    <path class="area" d="${area}"/>
+    ${bpts.length > 1 ? `<polyline class="bench" points="${bpts.join(" ")}"/>` : ""}
+    <polyline class="line" points="${pts.join(" ")}"/>
+    ${endLabels}
     <line class="cross" id="cx" y1="${T}" y2="${H-B}" visibility="hidden"/>
     <circle class="dot" id="cd" r="4.5" visibility="hidden"/>
     <rect x="${L}" y="0" width="${W-L-R}" height="${H}" fill="transparent" id="hit"/>
@@ -350,9 +471,10 @@ function drawChart(){
     cx.setAttribute("x1", X); cx.setAttribute("x2", X); cd.setAttribute("cx", X); cd.setAttribute("cy", Y);
     cx.setAttribute("visibility","visible"); cd.setAttribute("visibility","visible");
     tip.hidden = false;
-    tip.innerHTML = `${fmtD(data[i][0])} &nbsp;<b class="${cls(data[i][1])}">${pct(data[i][1])}</b>`;
+    tip.innerHTML = `${fmtD(data[i][0])}<br>Portfolio <b class="${cls(data[i][1])}">${pct(data[i][1])}</b>` +
+      (data[i][2] != null ? `<br>${esc(bName)} <b>${pct(data[i][2])}</b>` : "");
     tip.style.left = Math.min(Math.max(X - tip.offsetWidth/2, 0), W - tip.offsetWidth) + "px";
-    tip.style.top = Math.max(Y - 40, -8) + "px";
+    tip.style.top = Math.max(Math.min(Y, y(data[i][2] ?? data[i][1])) - tip.offsetHeight - 12, -8) + "px";
   };
   const leave = () => { tip.hidden = true; cx.setAttribute("visibility","hidden"); cd.setAttribute("visibility","hidden"); };
   const hit = svg.querySelector("#hit");
@@ -376,7 +498,7 @@ function renderStats(){
 
 let filter = "all", sortKey = "entryDate", sortDir = -1;
 const COLS = [
-  ["ticker","Ticker"],["side","Side"],["entryDate","Opened"],["entry","Entry",1],
+  ["ticker","Ticker"],["thesis","Thesis"],["side","Side"],["entryDate","Opened"],["entry","Entry",1],
   ["exitDate","Closed"],["px","Exit / Last",1],["held","Days",1],["ret","Return",1]
 ];
 function renderTable(){
@@ -384,7 +506,8 @@ function renderTable(){
   list.sort((a,b) => { const x=a[sortKey], y=b[sortKey]; return (x>y?1:x<y?-1:0) * sortDir; });
   const head = `<tr>${COLS.map(([k,l,n]) => `<th class="${n?'num':''}" data-k="${k}">${l}${sortKey===k?(sortDir>0?" ↑":" ↓"):""}</th>`).join("")}</tr>`;
   const body = list.map(r => `<tr>
-    <td><span class="tick">${esc(r.ticker)}</span><span class="co">${esc(r.name)}</span>${r.thesis?`<span class="thesis">${esc(r.thesis)}</span>`:""}</td>
+    <td><span class="tick">${esc(r.ticker)}</span><span class="co">${esc(r.name)}</span></td>
+    <td class="thesis">${esc(r.thesis || "")}</td>
     <td><span class="pill ${r.side}">${r.side.toUpperCase()}</span></td>
     <td>${fmtD(r.entryDate)}</td>
     <td class="num">${fmtP(r.entry)}</td>
@@ -393,7 +516,7 @@ function renderTable(){
     <td class="num">${r.held}</td>
     <td class="num ${cls(r.ret)}">${pct(r.ret)}</td>
   </tr>`).join("");
-  $("#pf").innerHTML = head + (body || `<tr><td colspan="8" class="open">No positions.</td></tr>`);
+  $("#pf").innerHTML = head + (body || `<tr><td colspan="9" class="open">No positions.</td></tr>`);
   $("#pf").querySelectorAll("th").forEach(th => th.onclick = () => {
     const k = th.dataset.k; sortDir = sortKey===k ? -sortDir : -1; sortKey = k; renderTable();
   });
@@ -408,12 +531,13 @@ $("#filters").addEventListener("click", e => {
 // ---------- Research ----------
 $("#papers").innerHTML = PAPERS.map(p => `<article class="paper">
   <h3>${esc(p.title)}</h3>
-  <div class="meta">${esc(p.authors)} · ${esc(p.venue)}, ${esc(p.year)}</div>
+  ${p.subtitle ? `<div class="psub">${esc(p.subtitle)}</div>` : ""}
+  <div class="meta">${[p.authors, p.date].filter(Boolean).map(esc).join(" · ")}</div>
   ${p.tags?.length ? `<div style="margin-top:6px">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>` : ""}
-  <details><summary>Abstract</summary><p>${esc(p.abstract)}</p></details>
+  ${p.abstract ? `<details><summary>Abstract</summary>${p.abstract.split(/\n\s*\n/).map(x => `<p>${esc(x)}</p>`).join("")}</details>` : `<div style="height:12px"></div>`}
   <div class="links">
     ${p.researchgate ? `<a href="${esc(p.researchgate)}" target="_blank" rel="noopener">ResearchGate ↗</a>` : ""}
-    ${p.pdf ? `<a href="${esc(p.pdf)}" download>Download PDF ↓</a>` : ""}
+    ${p.pdf ? `<a href="${esc(p.pdf)}" download>PDF${p.pages ? ` · ${p.pages} pp` : ""} ↓</a>` : ""}
   </div>
 </article>`).join("");
 
