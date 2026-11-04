@@ -1,6 +1,6 @@
 {
   "benchmark": "^GSPC",
   "benchmarkName": "S&P 500",
-  "inception": "2026-07-01",
+  "inception": "2024-01-30",
   "benchmarkAtInception": null
 }

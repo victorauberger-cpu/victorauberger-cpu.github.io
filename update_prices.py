@@ -85,16 +85,25 @@ def compute(positions, closes, settings=None):
         mask = s.index > entry
         if exit_ is not None:
             mask &= s.index < exit_
-        parts = [pd.Series({entry: float(p["entry"])}), s[mask]]
+        inside = s[mask]
+        # If Yahoo's listing trades at a different price level from the one recorded (another
+        # exchange, currency or ADR ratio), use Yahoo only for the day-to-day moves, scaled to the entry.
+        on_entry = s[s.index >= entry]
+        if len(on_entry) and abs(on_entry.iloc[0] / float(p["entry"]) - 1) > 0.25:
+            inside = inside * (float(p["entry"]) / on_entry.iloc[0])
+        parts = [pd.Series({entry: float(p["entry"])}), inside]
         if exit_ is not None and p.get("exit") not in (None, ""):
             parts.append(pd.Series({exit_: float(p["exit"])}))
         path = pd.concat(parts).sort_index()
         path = path[~path.index.duplicated(keep="last")]
 
-        # Value of 1 unit put into the trade: long = P/entry, short = 1 + (entry - P)/entry.
-        # This makes a single trade's cumulative return equal the simple return shown on the portfolio page.
+        # Value of 1 unit put into the trade: long = P/entry, short = 1 + (entry - P)/entry,
+        # with leverage multiplying the gain or loss. A single trade's cumulative return then equals
+        # the return shown on the portfolio page.
         e = float(p["entry"])
-        value = path / e if p["side"].lower() != "short" else 1 + (e - path) / e
+        lev = float(p.get("leverage") or 1)
+        raw = path / e - 1 if p["side"].lower() != "short" else (e - path) / e
+        value = 1 + lev * raw
         r = value.clip(lower=1e-6).pct_change().dropna()
         daily_returns.append(r.rename(t + "_" + p["entryDate"]))
 

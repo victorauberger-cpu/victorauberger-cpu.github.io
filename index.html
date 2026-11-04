@@ -47,9 +47,10 @@
   .filters{display:flex;gap:8px;margin:0 0 12px;font-family:var(--mono);font-size:13px}
   .filters button{font:inherit;background:none;border:1px solid var(--faint);color:var(--muted);padding:4px 12px;border-radius:999px;cursor:pointer}
   .filters button.on{color:var(--bg);background:var(--ink);border-color:var(--ink)}
+  #portfolio .tbl{width:min(1080px, calc(100vw - 32px));margin-left:50%;transform:translateX(-50%)}
   .tbl{overflow-x:auto;border:1px solid var(--faint);border-radius:8px;background:var(--card)}
   table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13px}
-  th,td{padding:10px 10px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--faint)}
+  th,td{padding:9px 8px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--faint)}
   th{font-weight:500;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;user-select:none}
   tr:last-child td{border-bottom:none}
   td.num,th.num{text-align:right}
@@ -59,7 +60,7 @@
   .long{color:var(--up)} .short{color:var(--down)}
   .up{color:var(--up)} .down{color:var(--down)}
   .open{color:var(--muted);font-style:italic}
-  .thesis{font-family:var(--serif);font-size:14px;color:var(--muted);white-space:normal;min-width:120px;max-width:200px}
+  .thesis{font-family:var(--serif);font-size:14px;color:var(--muted);white-space:normal;min-width:70px;max-width:200px}
 
   /* Home performance chart */
   .small{font-size:14px}
@@ -87,6 +88,40 @@
   .holdings .tick{min-width:64px}
   .holdings .since{color:var(--muted);flex:1}
   .sample{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--down);border:1px solid currentColor;border-radius:4px;padding:0 6px;margin-left:6px}
+
+  /* Research: key findings */
+  :root{ --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; }
+  @media (prefers-color-scheme: dark){ :root{ --s1:#3987e5; --s2:#d95926; --s3:#199e70; } }
+  .finding{margin:16px 0 6px;border:1px solid var(--faint);border-radius:10px;background:var(--card);padding:16px 16px 10px}
+  .kstats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+  .kstat b{display:block;font-family:var(--mono);font-weight:500;font-size:19px;line-height:1.25}
+  .kstat span{display:block;font-size:14px;color:var(--muted);line-height:1.35;margin-top:3px}
+  .vchart{position:relative}
+  .vhead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 14px;margin-bottom:8px}
+  .vtitle{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .vctl{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-family:var(--mono);font-size:12px}
+  .vctl span{color:var(--muted);margin-right:2px}
+  .vctl button{font:inherit;background:none;border:1px solid var(--faint);color:var(--muted);padding:3px 10px;border-radius:999px;cursor:pointer}
+  .vctl button.on,.vctl .vplay{color:var(--bg);background:var(--ink);border-color:var(--ink)}
+  .vscrub{width:150px;accent-color:var(--ink)}
+  .vlegend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:4px}
+  .vlegend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .vplot svg{display:block;overflow:visible}
+  .vgrid{stroke:var(--faint)} .vzero{stroke:var(--muted);stroke-width:1} .vref{stroke:var(--ink);stroke-dasharray:3 3}
+  .vax{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+  .vcat{font-family:var(--serif);font-size:14px;fill:var(--ink)}
+  .vval{font-family:var(--mono);font-size:12px;fill:var(--ink)}
+  .velab{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+  .vline{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+  .vdot{stroke:var(--card);stroke-width:2}
+  .vcross{stroke:var(--muted)}
+  .vhit{fill:transparent}
+  .vnote{font-size:14px;color:var(--muted);margin-top:6px;min-height:1em}
+  .vnote b{font-family:var(--mono);font-weight:500}
+  .vexplain{font-size:14px;color:var(--muted);margin:8px 0 2px;line-height:1.45}
+  .vsrc{font-style:italic}
+  .vtip{position:absolute;z-index:3;pointer-events:none;background:var(--card);border:1px solid var(--faint);border-radius:6px;padding:5px 9px;font-family:var(--mono);font-size:12px;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.08);white-space:nowrap}
+  @media (max-width:600px){ .kstats{grid-template-columns:1fr} .finding{padding:12px} }
 
   /* Research */
   .paper{border-top:1px solid var(--faint);padding:22px 0}
@@ -195,6 +230,8 @@
   <footer>© <span id="yr"></span> Victor Auberger</footer>
 </div>
 
+<script src="viz_data.js"></script>
+<script src="viz.js"></script>
 <script>
 /* =====================================================================
    EDIT YOUR CONTENT HERE (papers, recommendations).
@@ -273,17 +310,6 @@ const PAPERS = [
     pdf: "Auberger_Victor_LTCM_RiskModel_2025.pdf",
   },
   {
-    title: "Do Hedge Funds Still Hedge? A Pre-Registered Out-of-Sample Test of Asness, Krail and Liew (2001)",
-    subtitle: "A replication and 20-year out-of-sample study of stale prices and hidden market exposure in hedge fund indices",
-    authors: "Victor Auberger",
-    date: "February 2025",
-    pages: 27,
-    tags: ["Hedge funds", "Replication", "Pre-registered"],
-    abstract: "Asness, Krail and Liew (2001) showed that hedge funds hedge much less than simple statistics suggest: because many funds hold illiquid or hard-to-price assets, their reported returns react to market moves with a delay, and adding lagged market returns to a regression more than doubled the market beta of the aggregate hedge fund index and turned its alpha negative. This study tests whether that conclusion still holds, using a pre-registered design in which the hypotheses, decision rules, a power analysis and 144 robustness specifications were fixed before any regression was run. With the free EDHEC hedge fund style indices and the market factor of the Kenneth French Data Library, the original result replicates for January 1997 to September 2000: the lagged beta of an equal-weighted composite is 0.20 (p = 0.001) and triples its measured market exposure. In the 248 months from October 2000 to May 2021, the primary out-of-sample test also supports the hypothesis, but the effect is much smaller: the lagged beta is 0.057 (p = 0.009), raising the measured beta from 0.14 to 0.20, and it is significant in 127 of the 144 specifications. The lag is concentrated in illiquid strategies, such as distressed securities and fixed-income arbitrage, and is also present in the Barclay Hedge Fund Index in 2022–2024. Unlike in the original study, however, the lag does not remove hedge fund alpha over the full period, and it is larger after rising markets than after falling ones. Hedge funds hedge more than they did before 2000, but still less than their reported returns suggest.",
-    researchgate: "",
-    pdf: "Auberger_Victor_HedgeFunds_2025.pdf",
-  },
-  {
     title: "Forget Miltank: A Quantitative Search for the Best Team in Pokémon HeartGold and SoulSilver",
     subtitle: "A simulation study of 34 story battles, 219 obtainable Pokémon and every repeatable source of experience in Johto and Kanto",
     authors: "Victor Auberger",
@@ -325,8 +351,11 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const pct = (v, d=1) => { if (v == null || isNaN(v)) return "–"; const r = +(v*100).toFixed(d); return (r>0?"+":r<0?"−":"") + Math.abs(r).toFixed(d) + "%"; };
 const cls = (v, d=1) => { const t = 0.5 * Math.pow(10, -d) / 100; return v >= t ? "up" : v <= -t ? "down" : ""; };
+const CUR = {JPY:"¥", EUR:"€", GBP:"£", KRW:"₩", CHF:"CHF ", HKD:"HK$", SGD:"S$"};
+const cur = r => (r.currency && r.currency !== "USD") ? (CUR[r.currency] || r.currency + " ") : "";
 const fmtP = n => n == null ? "–" : Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtD = d => d ? new Date(d.slice(0,10)+"T00:00:00").toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) : "";
+const fmtDs = d => d ? new Date(d.slice(0,10)+"T00:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"2-digit"}) : "";
 const days = (a,b) => Math.round((new Date(b) - new Date(a)) / 864e5);
 $("#yr").textContent = new Date().getFullYear();
 
@@ -341,6 +370,7 @@ function route(){
   document.title = id === "home" ? "Victor Auberger" : `${PAGES.find(p=>p[0]===id)[1]} · Victor Auberger`;
   window.scrollTo(0,0);
   if (id === "home") drawChart();
+  if (id === "research") requestAnimationFrame(() => document.querySelectorAll(".vchart").forEach(c => c._redraw && c._redraw()));
 }
 window.addEventListener("hashchange", route);
 
@@ -348,7 +378,7 @@ window.addEventListener("hashchange", route);
 let rows = [], PRICES = { last:{}, series:[] };
 // Looks for the file in data/ first, then next to index.html (GitHub's web upload can flatten folders).
 async function getJSON(url){
-  for (const u of [url, url.replace(/^data\//, "")]){
+  for (const u of [url.replace(/^data\//, ""), url]){
     try { const r = await fetch(u + "?t=" + Date.now(), {cache:"no-store"}); if (r.ok) return await r.json(); } catch(e){}
   }
   throw new Error("not found: " + url);
@@ -362,14 +392,16 @@ async function load(){
   rows = positions.map(p => {
     const isOpen = p.exit == null || p.exit === "";
     const px = isOpen ? (PRICES.last?.[p.ticker] ?? p.last ?? null) : p.exit;
-    const ret = px == null ? null : (p.side === "short" ? (p.entry - px) / p.entry : (px - p.entry) / p.entry);
-    return {...p, isOpen, px, ret, held: days(p.entryDate, isOpen ? asOf : p.exitDate)};
+    const lev = Number(p.leverage) || 1;
+    const raw = px == null ? null : (p.side === "short" ? (p.entry - px) / p.entry : (px - p.entry) / p.entry);
+    const ret = raw == null ? null : raw * lev;
+    return {...p, lev, isOpen, px, ret, held: days(p.entryDate, isOpen ? asOf : p.exitDate)};
   });
   renderStats(); renderTable(); renderHoldings(); drawChart();
   const upd = PRICES.updated ? new Date(PRICES.updated) : null;
   const when = upd ? upd.toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "–";
   const sample = PRICES.sample ? '<span class="sample">sample data</span>' : "";
-  $("#asof").innerHTML = `Open positions marked at the latest Yahoo Finance price (updated ${when}, delayed ~15 min). Short returns = (entry − exit) / entry.${sample}`;
+  $("#asof").innerHTML = `Open positions marked at the latest Yahoo Finance price (updated ${when}, delayed ~15 min). Short returns = (entry − exit) / entry; leveraged returns are multiplied by the leverage. Prices in US dollars unless marked.${sample}`;
   $("#perfNote").innerHTML = `Equal-weighted across all positions since inception, in each stock's own currency, against the S&P 500. Updated ${when}.${sample}`;
 }
 
@@ -377,7 +409,7 @@ async function load(){
 function renderHoldings(){
   const open = rows.filter(r => r.isOpen).sort((a,b) => (b.ret??-9) - (a.ret??-9));
   $("#holdings").innerHTML = open.map(r => `<li>
-    <span class="tick">${esc(r.ticker)}</span><span class="pill ${r.side}">${r.side.toUpperCase()}</span>
+    <span class="tick">${esc(r.ticker)}</span><span class="pill ${r.side}">${r.side.toUpperCase()}${r.lev > 1 ? " " + r.lev + "×" : ""}</span>
     <span class="since">since ${fmtD(r.entryDate)}</span><span class="${cls(r.ret)}">${pct(r.ret)}</span></li>`).join("")
     || `<li class="note">No open positions right now.</li>`;
 }
@@ -504,7 +536,7 @@ function renderStats(){
 
 let filter = "all", sortKey = "entryDate", sortDir = -1;
 const COLS = [
-  ["ticker","Ticker"],["thesis","Thesis"],["side","Side"],["entryDate","Opened"],["entry","Entry",1],
+  ["ticker","Ticker"],["thesis","Thesis"],["side","Side"],["lev","Lev."],["entryDate","Opened"],["entry","Entry",1],
   ["exitDate","Closed"],["px","Exit / Last",1],["held","Days",1],["ret","Return",1]
 ];
 function renderTable(){
@@ -512,17 +544,18 @@ function renderTable(){
   list.sort((a,b) => { const x=a[sortKey], y=b[sortKey]; return (x>y?1:x<y?-1:0) * sortDir; });
   const head = `<tr>${COLS.map(([k,l,n]) => `<th class="${n?'num':''}" data-k="${k}">${l}${sortKey===k?(sortDir>0?" ↑":" ↓"):""}</th>`).join("")}</tr>`;
   const body = list.map(r => `<tr>
-    <td><span class="tick">${esc(r.ticker)}</span><span class="co">${esc(r.name)}</span></td>
+    <td><span class="tick">${esc(r.ticker)}</span><span class="co">${esc(r.name.replace(/ \(.*\)$/, ""))}</span></td>
     <td class="thesis">${esc(r.thesis || "")}</td>
     <td><span class="pill ${r.side}">${r.side.toUpperCase()}</span></td>
-    <td>${fmtD(r.entryDate)}</td>
-    <td class="num">${fmtP(r.entry)}</td>
-    <td>${r.isOpen ? '<span class="open">open</span>' : fmtD(r.exitDate)}</td>
-    <td class="num">${fmtP(r.px)}${r.isOpen?'<span class="co">last</span>':''}</td>
+    <td class="${r.lev > 1 ? "" : "open"}">${r.lev > 1 ? r.lev + "×" : "No"}</td>
+    <td>${fmtDs(r.entryDate)}</td>
+    <td class="num">${cur(r)}${fmtP(r.entry)}</td>
+    <td>${r.isOpen ? '<span class="open">open</span>' : fmtDs(r.exitDate)}</td>
+    <td class="num">${r.px == null ? "–" : cur(r) + fmtP(r.px)}${r.isOpen?'<span class="co">last</span>':''}</td>
     <td class="num">${r.held}</td>
     <td class="num ${cls(r.ret)}">${pct(r.ret)}</td>
   </tr>`).join("");
-  $("#pf").innerHTML = head + (body || `<tr><td colspan="9" class="open">No positions.</td></tr>`);
+  $("#pf").innerHTML = head + (body || `<tr><td colspan="10" class="open">No positions.</td></tr>`);
   $("#pf").querySelectorAll("th").forEach(th => th.onclick = () => {
     const k = th.dataset.k; sortDir = sortKey===k ? -sortDir : -1; sortKey = k; renderTable();
   });
@@ -540,12 +573,17 @@ $("#papers").innerHTML = PAPERS.map(p => `<article class="paper">
   ${p.subtitle ? `<div class="psub">${esc(p.subtitle)}</div>` : ""}
   <div class="meta">${[p.authors, p.date].filter(Boolean).map(esc).join(" · ")}</div>
   ${p.tags?.length ? `<div style="margin-top:6px">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>` : ""}
+  <div class="finding" data-title="${esc(p.title)}"></div>
   ${p.abstract ? `<details><summary>Abstract</summary>${p.abstract.split(/\n\s*\n/).map(x => `<p>${esc(x)}</p>`).join("")}</details>` : `<div style="height:12px"></div>`}
   <div class="links">
     ${p.researchgate ? `<a href="${esc(p.researchgate)}" target="_blank" rel="noopener">ResearchGate ↗</a>` : ""}
     ${p.pdf ? `<a href="${esc(p.pdf)}" download>PDF${p.pages ? ` · ${p.pages} pp` : ""} ↓</a>` : ""}
   </div>
 </article>`).join("");
+document.querySelectorAll(".finding").forEach(el => {
+  const t = el.dataset.title, key = typeof FINDINGS !== "undefined" && Object.keys(FINDINGS).find(k => t.startsWith(k));
+  if (key && window.renderFinding) renderFinding(el, FINDINGS[key]); else el.remove();
+});
 
 // ---------- Recommendations ----------
 if (SHOW_RECS) {
