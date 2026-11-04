@@ -1,6 +1,6 @@
 [
   {"ticker": "LDOS", "name": "Leidos", "side": "long", "entryDate": "2024-01-30", "entry": 111.78, "exitDate": "2024-08-01", "exit": 144.77, "leverage": 1, "thesis": ""},
-  {"ticker": "NVDA", "name": "Nvidia", "side": "long", "entryDate": "2024-02-26", "entry": 85.59, "exitDate": "2024-08-01", "exit": 105.84, "leverage": 1, "thesis": ""},
+  {"ticker": "NVDA", "name": "Nvidia", "side": "long", "entryDate": "2024-02-26", "entry": 82.46, "exitDate": "2024-08-01", "exit": 105.84, "leverage": 1, "thesis": ""},
   {"ticker": "LDOS", "name": "Leidos", "side": "long", "entryDate": "2025-09-08", "entry": 184.45, "exitDate": "2025-10-13", "exit": 186.42, "leverage": 1, "thesis": ""},
   {"ticker": "NVDA", "name": "Nvidia", "side": "long", "entryDate": "2025-09-08", "entry": 176.57, "exitDate": "2025-10-13", "exit": 183.89, "leverage": 1, "thesis": ""},
   {"ticker": "BRK-A", "name": "Berkshire Hathaway (A)", "side": "long", "entryDate": "2025-09-08", "entry": 741500.0, "exitDate": "2025-10-13", "exit": 737469.0, "leverage": 1, "thesis": ""},
@@ -20,6 +20,7 @@
   {"ticker": "285A.T", "name": "Kioxia Holdings", "side": "long", "entryDate": "2026-07-01", "entry": 26630.0, "exitDate": "2026-09-15", "exit": 18230.0, "leverage": 1, "currency": "JPY", "thesis": ""},
   {"ticker": "000660.KS", "name": "SK hynix", "side": "long", "entryDate": "2026-07-01", "entry": 168.95, "exitDate": "2026-07-17", "exit": 154.25, "leverage": 1, "thesis": ""},
   {"ticker": "SNDK", "name": "Sandisk", "side": "long", "entryDate": "2026-07-01", "entry": 1831.77, "exitDate": "2026-09-11", "exit": 1723.65, "leverage": 1, "thesis": ""},
+  {"ticker": "NFLX", "name": "Netflix", "side": "long", "entryDate": "2026-07-01", "entry": 75.27, "exitDate": "2026-09-15", "exit": 70.99, "leverage": 1, "thesis": ""},
   {"ticker": "MSFT", "name": "Microsoft", "side": "long", "entryDate": "2026-07-01", "entry": 389.03, "exitDate": "2026-09-15", "exit": 503.34, "leverage": 1, "thesis": ""},
   {"ticker": "BIRK", "name": "Birkenstock", "side": "long", "entryDate": "2026-11-03", "entry": 35.4, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
   {"ticker": "LDOS", "name": "Leidos", "side": "long", "entryDate": "2026-11-03", "entry": 134.52, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
