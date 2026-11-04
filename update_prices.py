@@ -7,10 +7,9 @@ Fetches prices from Yahoo Finance (free, via the yfinance library) and writes da
 Runs automatically on GitHub (see .github/workflows/deploy.yml). You never need to run it yourself,
 but you can locally with:  pip install yfinance pandas && python scripts/update_prices.py
 
-Method (money-weighted): on each day, the portfolio line is the total gain in money of all trades so far
-divided by the total money put into them, so bigger trades count more. The benchmark line is the same
-money put into the S&P 500 on the same buy dates and taken out on the same sell dates. Sizes come from
-the private GitHub secret POSITION_SIZES and are never published; only percentages are. A position
+Method: each day, the open positions' gains weighted by their size (sizes come from the private
+GitHub secret POSITION_SIZES and are never published). On days with no open position, the money is
+assumed to sit in the S&P 500. The benchmark line is the S&P 500 held throughout. A position
 starts at your entry price (start of its entry day) and ends at your exit price (end of its exit
 day), so it matches what you recorded. Returns are in each stock's own currency.
 """
@@ -75,15 +74,16 @@ def fetch_closes(tickers, start):
 
 
 def compute(positions, closes, settings=None):
-    """Money-weighted performance.
-    Portfolio: total gain in money / total money invested in the trades opened so far.
-    Benchmark: the same money put into the benchmark on the same buy dates and taken out on the same sell dates."""
+    """Time-weighted performance, as funds report it.
+    Each day: the gain of the open positions, weighted by their size, divided by what they were worth that
+    morning. On days with no open position the money is assumed to sit in the benchmark (S&P 500).
+    The benchmark line is the S&P 500 held throughout."""
     settings = settings or {}
     start = pd.Timestamp(settings.get("inception") or min(p["entryDate"] for p in positions))
     b = settings.get("benchmark")
     bs = closes[b].dropna() if b and b in closes.columns else None
 
-    last, paths = {}, []
+    last, legs = {}, []
     for p in positions:
         t = p["ticker"]
         s = closes[t].dropna() if t in closes.columns else pd.Series(dtype=float)
@@ -109,38 +109,40 @@ def compute(positions, closes, settings=None):
         e = float(p["entry"])
         lev = float(p.get("leverage") or 1)
         raw = path / e - 1 if p["side"].lower() != "short" else (e - path) / e
-        size = float(p.get("weight") or 1)
-        pnl = (size * (lev * raw).clip(lower=-1))          # money gained or lost, never more than the stake
-        paths.append((entry, exit_, size, pnl))
+        value = (1 + lev * raw).clip(lower=1e-6)       # 1 unit put into the trade
+        w = float(p.get("weight") or 1)
+        key = t + "_" + p["entryDate"]
+        legs.append(((w * value.shift(1)).dropna().rename(key), (w * value.diff()).dropna().rename(key)))
 
     idx = closes.index[closes.index >= start].union(pd.DatetimeIndex([start]))
-    for entry, exit_, _, pnl in paths:
-        idx = idx.union(pnl.index)
+    for v, g in legs:
+        idx = idx.union(v.index)
     idx = idx[idx >= start]
 
-    tot_pnl = pd.Series(0.0, index=idx)
-    tot_inv = pd.Series(0.0, index=idx)
-    tot_bench = pd.Series(0.0, index=idx)
-    bfull = bs.reindex(bs.index.union(idx)).ffill() if bs is not None else None
-    for entry, exit_, size, pnl in paths:
-        live = idx >= entry
-        tot_inv[live] += size
-        tot_pnl += pnl.reindex(idx).ffill().fillna(0.0).where(live, 0.0)
-        if bfull is not None:
-            prior = bs[bs.index < entry]
-            if not len(prior):
-                continue
-            base = float(prior.iloc[-1])
-            level = bfull.reindex(idx)
-            if exit_ is not None:
-                level = level.where(idx <= exit_)   # frozen after the sale
-                level = level.ffill()
-            tot_bench += (size * (level / base - 1)).fillna(0.0).where(live, 0.0)
+    if legs:
+        V = pd.concat([v for v, _ in legs], axis=1).reindex(idx)
+        G = pd.concat([g for _, g in legs], axis=1).reindex(idx)
+        den = V.sum(axis=1, min_count=1)
+        held = den > 0
+        r_port = (G.sum(axis=1, min_count=1) / den).where(held)
+    else:
+        held = pd.Series(False, index=idx)
+        r_port = pd.Series(float("nan"), index=idx)
 
-    port = (tot_pnl / tot_inv).where(tot_inv > 0, 0.0)
-    bench = (tot_bench / tot_inv).where(tot_inv > 0, 0.0) if bfull is not None else None
-    if b and bs is not None and len(bs):
+    bench = None
+    if bs is not None and len(bs):
+        base = settings.get("benchmarkAtInception")
+        if base is None:
+            prior = bs[bs.index < start]
+            base = float(prior.iloc[-1]) if len(prior) else float(bs.iloc[0])
+        level = bs.reindex(bs.index.union(idx)).ffill().reindex(idx)
+        level.iloc[0] = float(base) if pd.isna(level.iloc[0]) or idx[0] == start else level.iloc[0]
+        level = level.ffill()
+        r_bench = level.pct_change().fillna(0.0)
+        bench = level / float(base) - 1
         last[b] = round(float(bs.iloc[-1]), 4)
+        r_port = r_port.where(held, r_bench)            # idle money sits in the S&P 500
+    port = (1 + r_port.fillna(0.0)).cumprod() - 1
 
     series = []
     for ts in idx:
