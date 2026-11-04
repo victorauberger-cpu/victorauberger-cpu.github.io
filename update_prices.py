@@ -29,18 +29,46 @@ OUT = DATA / "prices.json"
 EOD = pd.Timedelta(hours=23, minutes=59)   # daily closes are stamped at the end of their day
 
 
-def fetch_closes(tickers, start):
-    import yfinance as yf
-
-    df = yf.download(tickers, start=start, interval="1d", auto_adjust=False,
-                     progress=False, threads=True)
-    closes = df["Close"]
-    if isinstance(closes, pd.Series):
-        closes = closes.to_frame(tickers[0])
-    idx = pd.to_datetime(closes.index)
+def _clean_index(s):
+    idx = pd.to_datetime(s.index)
     if idx.tz is not None:
         idx = idx.tz_localize(None)
-    closes.index = idx.normalize() + EOD
+    s.index = idx.normalize() + EOD
+    return s
+
+
+def fetch_closes(tickers, start):
+    """Batch download from Yahoo, then retry any ticker that came back empty one by one.
+    Yahoo sometimes drops a symbol from a batch request; without the retry it would show no price."""
+    import time
+    import yfinance as yf
+
+    try:
+        df = yf.download(tickers, start=start, interval="1d", auto_adjust=False,
+                         progress=False, threads=False)
+        closes = df["Close"]
+        if isinstance(closes, pd.Series):
+            closes = closes.to_frame(tickers[0])
+        closes = _clean_index(closes)
+    except Exception as e:
+        print("Batch download failed:", e)
+        closes = pd.DataFrame()
+
+    missing = [t for t in tickers if t not in closes.columns or closes[t].dropna().empty]
+    for t in missing:
+        for attempt in range(3):
+            try:
+                h = yf.Ticker(t).history(start=start, interval="1d", auto_adjust=False)
+                if not h.empty:
+                    s = _clean_index(h["Close"].copy()).rename(t)
+                    closes = closes.drop(columns=[t], errors="ignore").join(s, how="outer") if not closes.empty else s.to_frame()
+                    print(f"Recovered {t} on retry {attempt + 1}")
+                    break
+            except Exception as e:
+                print(f"Retry {attempt + 1} for {t} failed:", e)
+            time.sleep(3 * (attempt + 1))
+        else:
+            print(f"WARNING: no price for {t} from Yahoo this run")
     return closes.sort_index().ffill()
 
 
