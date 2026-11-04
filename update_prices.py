@@ -7,8 +7,10 @@ Fetches prices from Yahoo Finance (free, via the yfinance library) and writes da
 Runs automatically on GitHub (see .github/workflows/deploy.yml). You never need to run it yourself,
 but you can locally with:  pip install yfinance pandas && python scripts/update_prices.py
 
-Method: every position counts equally (no amounts are used). Each day, the portfolio return is the
-average daily return of the positions open that day; shorts gain when the price falls. A position
+Method: positions are weighted by their size ("weight" in positions.json: the share of the money
+invested at the time, never the amount). Each day, the portfolio return is the total gain of the open
+positions divided by what they were worth at the start of the day; shorts gain when the price falls.
+Positions without a weight count as 1. A position
 starts at your entry price (start of its entry day) and ends at your exit price (end of its exit
 day), so it matches what you recorded. Returns are in each stock's own currency.
 """
@@ -103,16 +105,27 @@ def compute(positions, closes, settings=None):
         e = float(p["entry"])
         lev = float(p.get("leverage") or 1)
         raw = path / e - 1 if p["side"].lower() != "short" else (e - path) / e
-        value = 1 + lev * raw
-        r = value.clip(lower=1e-6).pct_change().dropna()
-        daily_returns.append(r.rename(t + "_" + p["entryDate"]))
+        value = (1 + lev * raw).clip(lower=1e-6)
+        w = float(p.get("weight") or 1)
+        key = t + "_" + p["entryDate"]
+        # money in the position at the start of each day, and that day's gain
+        prev_val = (w * value.shift(1)).dropna()
+        gain = (w * value.diff()).dropna()
+        daily_returns.append((prev_val.rename(key), gain.rename(key)))
 
     start = pd.Timestamp(settings.get("inception") or min(p["entryDate"] for p in positions))
     calendar = closes.index[closes.index >= start].union(pd.DatetimeIndex([start]))
-    R = pd.concat(daily_returns, axis=1) if daily_returns else pd.DataFrame(index=calendar)
-    R = R.reindex(R.index.union(calendar))
-    R = R[R.index >= start]
-    port = R.mean(axis=1, skipna=True).fillna(0.0)
+    # Size-weighted: each day, total gain of open positions / money in them at the start of the day.
+    if daily_returns:
+        V = pd.concat([v for v, _ in daily_returns], axis=1)
+        G = pd.concat([g for _, g in daily_returns], axis=1)
+    else:
+        V = G = pd.DataFrame(index=calendar)
+    idx = V.index.union(calendar)
+    V, G = V.reindex(idx), G.reindex(idx)
+    den = V.sum(axis=1, min_count=1)
+    port = (G.sum(axis=1, min_count=1) / den).where(den > 0).fillna(0.0)
+    port = port[port.index >= start]
     cum = (1 + port).cumprod() - 1
 
     # Benchmark: buy-and-hold from its level at inception.

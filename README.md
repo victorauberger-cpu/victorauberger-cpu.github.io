@@ -33,4 +33,4 @@ Copy a line, change the values, and keep the comma between lines:
 You can also trigger it from the **Actions** tab → *Update prices & deploy* → **Run workflow**.
 
 Prices are delayed (Yahoo's free data is ~15 min behind, plus up to 30 min between updates).
-The chart is equal-weighted, because no amounts are recorded.
+The chart weights each position by its "weight" (its % of the money invested at the time; amounts are never stored). Leave it out and positions count equally.

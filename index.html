@@ -402,7 +402,7 @@ async function load(){
   const when = upd ? upd.toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "–";
   const sample = PRICES.sample ? '<span class="sample">sample data</span>' : "";
   $("#asof").innerHTML = `Open positions marked at the latest Yahoo Finance price (updated ${when}, delayed ~15 min). Short returns = (entry − exit) / entry; leveraged returns are multiplied by the leverage. Prices in US dollars unless marked.${sample}`;
-  $("#perfNote").innerHTML = `Equal-weighted across all positions since inception, in each stock's own currency, against the S&P 500. Updated ${when}.${sample}`;
+  $("#perfNote").innerHTML = `Weighted by the size of each position (sizes not shown), in each stock's own currency, against the S&P 500. Updated ${when}.${sample}`;
 }
 
 // ---------- Home: open holdings ----------
