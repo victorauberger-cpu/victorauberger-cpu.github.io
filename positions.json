@@ -6,5 +6,6 @@
   {"ticker": "ENPH", "name": "Enphase Energy",     "side": "short", "entryDate": "2026-11-03", "entry": 30.42,  "exitDate": "2026-11-04", "exit": 33.36, "thesis": ""},
   {"ticker": "IREN", "name": "Iren Limited",       "side": "short", "entryDate": "2026-11-04", "entry": 22.29,  "exitDate": "",           "exit": null,  "thesis": ""},
   {"ticker": "MRVL", "name": "Marvell Technology", "side": "short", "entryDate": "2026-11-04", "entry": 163.18, "exitDate": "",           "exit": null,  "thesis": ""},
-  {"ticker": "CIFR", "name": "Cipher Digital",     "side": "short", "entryDate": "2026-11-04", "entry": 6.70,   "exitDate": "",           "exit": null,  "thesis": ""}
+  {"ticker": "CIFR", "name": "Cipher Digital",     "side": "short", "entryDate": "2026-11-04", "entry": 6.70,   "exitDate": "",           "exit": null,  "thesis": ""},
+  {"ticker": "PLTR", "name": "Palantir Technologies",     "side": "short", "entryDate": "2026-11-04", "entry": 175.30,   "exitDate": "",           "exit": null,  "thesis": ""}
 ]
