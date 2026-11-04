@@ -4,4 +4,7 @@
   {"ticker": "PFE",  "name": "Pfizer",         "side": "long",  "entryDate": "2026-11-03", "entry": 29.92,  "exitDate": "", "exit": null, "thesis": ""},
   {"ticker": "T",    "name": "AT&T",           "side": "long",  "entryDate": "2026-11-03", "entry": 21.32,  "exitDate": "", "exit": null, "thesis": ""},
   {"ticker": "ENPH", "name": "Enphase Energy", "side": "short", "entryDate": "2026-11-03", "entry": 30.42,  "exitDate": "2026-11-04", "exit": 33.36, "thesis": ""}
+  {"ticker": "IREN", "name": "Iren Limited",   "side": "short",  "entryDate": "2026-11-04", "entry": 22.29,  "exitDate": "", "exit": null, "thesis": ""},
+  {"ticker": "MRVL", "name": "Marvell Technology",   "side": "short",  "entryDate": "2026-11-04", "entry": 163.18,  "exitDate": "", "exit": null, "thesis": ""},
+  {"ticker": "CIFR", "name": "Cipher Digital",   "side": "short",  "entryDate": "2026-11-04", "entry": 6.70,  "exitDate": "", "exit": null, "thesis": ""},
 ]
