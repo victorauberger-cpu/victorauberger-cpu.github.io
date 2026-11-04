@@ -3,5 +3,5 @@
   {"ticker": "LDOS", "name": "Leidos",         "side": "long",  "entryDate": "2026-11-03", "entry": 134.52, "exitDate": "", "exit": null, "thesis": ""},
   {"ticker": "PFE",  "name": "Pfizer",         "side": "long",  "entryDate": "2026-11-03", "entry": 29.92,  "exitDate": "", "exit": null, "thesis": ""},
   {"ticker": "T",    "name": "AT&T",           "side": "long",  "entryDate": "2026-11-03", "entry": 21.32,  "exitDate": "", "exit": null, "thesis": ""},
-  {"ticker": "ENPH", "name": "Enphase Energy", "side": "short", "entryDate": "2026-11-03", "entry": 30.42,  "exitDate": "", "exit": null, "thesis": ""}
+  {"ticker": "ENPH", "name": "Enphase Energy", "side": "short", "entryDate": "2026-11-03", "entry": 30.42,  "exitDate": "2026-11-04", "exit": 33.36, "thesis": ""}
 ]
