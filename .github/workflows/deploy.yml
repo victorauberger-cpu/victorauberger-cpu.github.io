@@ -29,6 +29,8 @@ jobs:
           python-version: "3.12"
       - run: pip install yfinance pandas
       - name: Fetch prices from Yahoo Finance
+        env:
+          POSITION_SIZES: ${{ secrets.POSITION_SIZES }}
         run: python update_prices.py || echo "::warning::Price update failed, publishing previous prices"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
