@@ -402,7 +402,7 @@ async function load(){
   const when = upd ? upd.toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "–";
   const sample = PRICES.sample ? '<span class="sample">sample data</span>' : "";
   $("#asof").innerHTML = `Open positions marked at the latest Yahoo Finance price (updated ${when}, delayed ~15 min). Short returns = (entry − exit) / entry; leveraged returns are multiplied by the leverage. Prices in US dollars unless marked.${sample}`;
-  $("#perfNote").innerHTML = `Weighted by the size of each position (sizes not shown), in each stock's own currency, against the S&P 500. Updated ${when}.${sample}`;
+  $("#perfNote").innerHTML = `Money-weighted: gains on all trades ÷ money put into them, so bigger trades count more (amounts never shown). The S&amp;P 500 line puts the same money in on the same buy dates and takes it out on the same sell dates. The lines step down when new money comes in, because it starts at 0%. Updated ${when}.${sample}`;
 }
 
 // ---------- Home: open holdings ----------
@@ -430,8 +430,7 @@ function sliceRange(series){
   if (range === "1Y") from.setFullYear(from.getFullYear()-1);
   if (range === "YTD") { from.setMonth(0); from.setDate(1); }
   const i = Math.max(0, series.findIndex(d => new Date(d[0]) >= from) - 1);
-  const b1 = 1 + series[i][1], b2 = 1 + (series[i][2] ?? 0);   // rebase so the window starts at 0%
-  return series.slice(i).map(([d,v,w]) => [d, (1+v)/b1 - 1, w == null ? null : (1+w)/b2 - 1]);
+  return series.slice(i);   // zoom only: values stay "since inception" (money-weighted lines can't be rebased)
 }
 function niceStep(span){ const raw = span/4, mag = Math.pow(10, Math.floor(Math.log10(raw))); return [1,2,2.5,5,10].map(m=>m*mag).find(s => s >= raw); }
 
@@ -442,12 +441,12 @@ function drawChart(){
   const bName = PRICES.benchmarkName || "S&P 500";
   const tip = $("#tip");
   box.querySelector("svg")?.remove(); box.querySelector(".empty")?.remove();
-  $("#legend").innerHTML = `<span><i style="background:var(--accent)"></i>Portfolio</span>` + (hasB ? `<span><i style="background:var(--bench)"></i>${esc(bName)}</span>` : "");
+  $("#legend").innerHTML = `<span><i style="background:var(--accent)"></i>Portfolio</span>` + (hasB ? `<span><i style="background:var(--bench)"></i>${esc(bName)}, same money &amp; dates</span>` : "");
   if (!data.length){ $("#perfVal").textContent = "–"; return; }
 
   const last = data[data.length-1];
   $("#perfVal").textContent = pct(last[1], 2); $("#perfVal").className = "perf-val " + cls(last[1], 2);
-  const since = range === "ALL" ? `since ${fmtD(data[0][0])}` : range === "YTD" ? "year to date" : `last ${range.toLowerCase()}`;
+  const since = `on money invested since ${fmtD((PRICES.series || data)[0][0])}`;
   $("#perfLbl").textContent = since + (hasB && last[2] != null ? ` · ${bName} ${pct(last[2], 2)}` : "");
 
   const daysSpan = (new Date(last[0]) - new Date(data[0][0])) / 864e5;

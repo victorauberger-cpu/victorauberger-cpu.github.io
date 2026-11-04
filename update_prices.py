@@ -7,10 +7,10 @@ Fetches prices from Yahoo Finance (free, via the yfinance library) and writes da
 Runs automatically on GitHub (see .github/workflows/deploy.yml). You never need to run it yourself,
 but you can locally with:  pip install yfinance pandas && python scripts/update_prices.py
 
-Method: positions are weighted by their size ("weight" in positions.json: the share of the money
-invested at the time, never the amount). Each day, the portfolio return is the total gain of the open
-positions divided by what they were worth at the start of the day; shorts gain when the price falls.
-Positions without a weight count as 1. A position
+Method (money-weighted): on each day, the portfolio line is the total gain in money of all trades so far
+divided by the total money put into them, so bigger trades count more. The benchmark line is the same
+money put into the S&P 500 on the same buy dates and taken out on the same sell dates. Sizes come from
+the private GitHub secret POSITION_SIZES and are never published; only percentages are. A position
 starts at your entry price (start of its entry day) and ends at your exit price (end of its exit
 day), so it matches what you recorded. Returns are in each stock's own currency.
 """
@@ -75,8 +75,15 @@ def fetch_closes(tickers, start):
 
 
 def compute(positions, closes, settings=None):
+    """Money-weighted performance.
+    Portfolio: total gain in money / total money invested in the trades opened so far.
+    Benchmark: the same money put into the benchmark on the same buy dates and taken out on the same sell dates."""
     settings = settings or {}
-    last, daily_returns = {}, []
+    start = pd.Timestamp(settings.get("inception") or min(p["entryDate"] for p in positions))
+    b = settings.get("benchmark")
+    bs = closes[b].dropna() if b and b in closes.columns else None
+
+    last, paths = {}, []
     for p in positions:
         t = p["ticker"]
         s = closes[t].dropna() if t in closes.columns else pd.Series(dtype=float)
@@ -99,61 +106,78 @@ def compute(positions, closes, settings=None):
         path = pd.concat(parts).sort_index()
         path = path[~path.index.duplicated(keep="last")]
 
-        # Value of 1 unit put into the trade: long = P/entry, short = 1 + (entry - P)/entry,
-        # with leverage multiplying the gain or loss. A single trade's cumulative return then equals
-        # the return shown on the portfolio page.
         e = float(p["entry"])
         lev = float(p.get("leverage") or 1)
         raw = path / e - 1 if p["side"].lower() != "short" else (e - path) / e
-        value = (1 + lev * raw).clip(lower=1e-6)
-        w = float(p.get("weight") or 1)
-        key = t + "_" + p["entryDate"]
-        # money in the position at the start of each day, and that day's gain
-        prev_val = (w * value.shift(1)).dropna()
-        gain = (w * value.diff()).dropna()
-        daily_returns.append((prev_val.rename(key), gain.rename(key)))
+        size = float(p.get("weight") or 1)
+        pnl = (size * (lev * raw).clip(lower=-1))          # money gained or lost, never more than the stake
+        paths.append((entry, exit_, size, pnl))
 
-    start = pd.Timestamp(settings.get("inception") or min(p["entryDate"] for p in positions))
-    calendar = closes.index[closes.index >= start].union(pd.DatetimeIndex([start]))
-    # Size-weighted: each day, total gain of open positions / money in them at the start of the day.
-    if daily_returns:
-        V = pd.concat([v for v, _ in daily_returns], axis=1)
-        G = pd.concat([g for _, g in daily_returns], axis=1)
-    else:
-        V = G = pd.DataFrame(index=calendar)
-    idx = V.index.union(calendar)
-    V, G = V.reindex(idx), G.reindex(idx)
-    den = V.sum(axis=1, min_count=1)
-    port = (G.sum(axis=1, min_count=1) / den).where(den > 0).fillna(0.0)
-    port = port[port.index >= start]
-    cum = (1 + port).cumprod() - 1
+    idx = closes.index[closes.index >= start].union(pd.DatetimeIndex([start]))
+    for entry, exit_, _, pnl in paths:
+        idx = idx.union(pnl.index)
+    idx = idx[idx >= start]
 
-    # Benchmark: buy-and-hold from its level at inception.
-    bench = None
-    b = settings.get("benchmark")
-    if b and b in closes.columns:
-        bs = closes[b].dropna()
-        base = settings.get("benchmarkAtInception")
-        if base is None:
-            prior = bs[bs.index < start]
-            base = float(prior.iloc[-1]) if len(prior) else float(bs.iloc[0])
-        bs = pd.concat([pd.Series({start: float(base)}), bs[bs.index > start]])
-        bs = bs[~bs.index.duplicated(keep="last")].sort_index()
-        bench = (bs.reindex(bs.index.union(cum.index)).ffill() / float(base) - 1).reindex(cum.index)
-        last[b] = round(float(closes[b].dropna().iloc[-1]), 4)
+    tot_pnl = pd.Series(0.0, index=idx)
+    tot_inv = pd.Series(0.0, index=idx)
+    tot_bench = pd.Series(0.0, index=idx)
+    bfull = bs.reindex(bs.index.union(idx)).ffill() if bs is not None else None
+    for entry, exit_, size, pnl in paths:
+        live = idx >= entry
+        tot_inv[live] += size
+        tot_pnl += pnl.reindex(idx).ffill().fillna(0.0).where(live, 0.0)
+        if bfull is not None:
+            prior = bs[bs.index < entry]
+            if not len(prior):
+                continue
+            base = float(prior.iloc[-1])
+            level = bfull.reindex(idx)
+            if exit_ is not None:
+                level = level.where(idx <= exit_)   # frozen after the sale
+                level = level.ffill()
+            tot_bench += (size * (level / base - 1)).fillna(0.0).where(live, 0.0)
+
+    port = (tot_pnl / tot_inv).where(tot_inv > 0, 0.0)
+    bench = (tot_bench / tot_inv).where(tot_inv > 0, 0.0) if bfull is not None else None
+    if b and bs is not None and len(bs):
+        last[b] = round(float(bs.iloc[-1]), 4)
 
     series = []
-    for ts, v in cum.items():
-        row = [ts.strftime("%Y-%m-%dT%H:%M"), round(float(v), 5)]
+    for ts in idx:
+        row = [ts.strftime("%Y-%m-%dT%H:%M"), round(float(port[ts]), 5)]
         if bench is not None:
-            bv = bench.get(ts)
-            row.append(None if pd.isna(bv) else round(float(bv), 5))
+            row.append(round(float(bench[ts]), 5))
         series.append(row)
     return last, series
 
 
+def apply_private_sizes(positions):
+    """Position sizes live in the private GitHub secret POSITION_SIZES, never in the public files.
+    Format: {"LDOS 2024-01-30": 8.3, "NVDA 2024-02-26": 4.1, ...} (any unit, e.g. thousands of euros).
+    Trades without a size get the median size, i.e. they count as a typical position."""
+    import os
+    raw = os.environ.get("POSITION_SIZES", "").strip()
+    sizes = {}
+    if raw:
+        try:
+            sizes = {k.strip(): float(v) for k, v in json.loads(raw).items()}
+        except Exception:
+            print("POSITION_SIZES is not valid JSON; using equal sizes")
+    if not sizes:
+        return
+    typical = float(pd.Series(list(sizes.values())).median())
+    found = 0
+    for p in positions:
+        s = sizes.get(f'{p["ticker"]} {p["entryDate"]}')
+        if s is not None:
+            found += 1
+        p["weight"] = s if s is not None else typical
+    print(f"Private sizes applied to {found} of {len(positions)} trades")  # counts only, never the sizes
+
+
 def main():
     positions = json.loads(POSITIONS.read_text())
+    apply_private_sizes(positions)
     settings = json.loads(SETTINGS.read_text()) if SETTINGS.exists() else {}
     tickers = sorted({p["ticker"] for p in positions} | ({settings["benchmark"]} if settings.get("benchmark") else set()))
     start = min([p["entryDate"] for p in positions] + ([settings["inception"]] if settings.get("inception") else []))
