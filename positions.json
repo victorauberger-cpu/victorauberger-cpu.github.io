@@ -25,7 +25,7 @@
   {"ticker": "BIRK", "name": "Birkenstock", "side": "long", "entryDate": "2026-11-03", "entry": 35.4, "exitDate": "2026-11-05", "exit": 37.39, "leverage": 1, "thesis": ""},
   {"ticker": "LDOS", "name": "Leidos", "side": "long", "entryDate": "2026-11-03", "entry": 134.52, "exitDate": "2026-11-05", "exit": 135.68, "leverage": 1, "thesis": ""},
   {"ticker": "PFE", "name": "Pfizer", "side": "long", "entryDate": "2026-11-03", "entry": 29.92, "exitDate": "2026-11-05", "exit": 30.95, "leverage": 1, "thesis": ""},
-  {"ticker": "T", "name": "AT&T", "side": "long", "entryDate": "2026-11-03", "entry": 21.32, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
+  {"ticker": "T", "name": "AT&T", "side": "long", "entryDate": "2026-11-03", "entry": 21.32, "exitDate": "2026-11-05", "exit": 21.82, "leverage": 1, "thesis": ""},
   {"ticker": "ENPH", "name": "Enphase Energy", "side": "short", "entryDate": "2026-11-03", "entry": 30.42, "exitDate": "2026-11-04", "exit": 33.36, "leverage": 1, "thesis": ""},
   {"ticker": "IREN", "name": "Iren Limited", "side": "short", "entryDate": "2026-11-04", "entry": 22.29, "exitDate": "2026-11-05", "exit": 18.03, "leverage": 1, "thesis": ""},
   {"ticker": "MRVL", "name": "Marvell Technology", "side": "short", "entryDate": "2026-11-04", "entry": 163.18, "exitDate": "2026-11-05", "exit": 133.55, "leverage": 1, "thesis": ""},
