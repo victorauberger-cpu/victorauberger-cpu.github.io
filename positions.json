@@ -22,13 +22,15 @@
   {"ticker": "SNDK", "name": "Sandisk", "side": "long", "entryDate": "2026-07-01", "entry": 2066.01, "exitDate": "2026-09-11", "exit": 1668.75, "leverage": 1, "thesis": ""},
   {"ticker": "NFLX", "name": "Netflix", "side": "long", "entryDate": "2026-07-01", "entry": 73.34, "exitDate": "2026-09-15", "exit": 78.47, "leverage": 1, "thesis": ""},
   {"ticker": "MSFT", "name": "Microsoft", "side": "long", "entryDate": "2026-07-01", "entry": 381.86, "exitDate": "2026-09-15", "exit": 500.72, "leverage": 1, "thesis": ""},
-  {"ticker": "BIRK", "name": "Birkenstock", "side": "long", "entryDate": "2026-11-03", "entry": 35.4, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
-  {"ticker": "LDOS", "name": "Leidos", "side": "long", "entryDate": "2026-11-03", "entry": 134.52, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
-  {"ticker": "PFE", "name": "Pfizer", "side": "long", "entryDate": "2026-11-03", "entry": 29.92, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
+  {"ticker": "BIRK", "name": "Birkenstock", "side": "long", "entryDate": "2026-11-03", "entry": 35.4, "exitDate": "2026-11-05", "exit": 37.39, "leverage": 1, "thesis": ""},
+  {"ticker": "LDOS", "name": "Leidos", "side": "long", "entryDate": "2026-11-03", "entry": 134.52, "exitDate": "2026-11-05", "exit": 135.68, "leverage": 1, "thesis": ""},
+  {"ticker": "PFE", "name": "Pfizer", "side": "long", "entryDate": "2026-11-03", "entry": 29.92, "exitDate": "2026-11-05", "exit": 30.95, "leverage": 1, "thesis": ""},
   {"ticker": "T", "name": "AT&T", "side": "long", "entryDate": "2026-11-03", "entry": 21.32, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
   {"ticker": "ENPH", "name": "Enphase Energy", "side": "short", "entryDate": "2026-11-03", "entry": 30.42, "exitDate": "2026-11-04", "exit": 33.36, "leverage": 1, "thesis": ""},
   {"ticker": "IREN", "name": "Iren Limited", "side": "short", "entryDate": "2026-11-04", "entry": 22.29, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
   {"ticker": "MRVL", "name": "Marvell Technology", "side": "short", "entryDate": "2026-11-04", "entry": 163.18, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
   {"ticker": "CIFR", "name": "Cipher Digital", "side": "short", "entryDate": "2026-11-04", "entry": 6.7, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
-  {"ticker": "PLTR", "name": "Palantir Technologies", "side": "short", "entryDate": "2026-11-04", "entry": 175.3, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""}
+  {"ticker": "PLTR", "name": "Palantir Technologies", "side": "short", "entryDate": "2026-11-04", "entry": 175.3, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
+  {"ticker": "NFLX", "name": "Netflix", "side": "long", "entryDate": "2026-11-05", "entry": 67.28, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
+  {"ticker": "SAN", "name": "Banco Santander (ADR)", "side": "long", "entryDate": "2026-11-05", "entry": 12.24, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""}
 ]
