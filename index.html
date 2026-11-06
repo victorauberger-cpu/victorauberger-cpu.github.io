@@ -62,6 +62,18 @@
   .open{color:var(--muted);font-style:italic}
   .thesis{font-family:var(--serif);font-size:14px;color:var(--muted);white-space:normal;min-width:70px;max-width:200px}
 
+  /* Risk table + write-ups */
+  table.risk td,table.risk th{text-align:right}
+  table.risk td:first-child,table.risk th:first-child{text-align:left;font-family:var(--serif);font-size:15px}
+  table.risk th{cursor:default}
+  #portfolio .tbl.riskwrap{width:auto;margin-left:0;transform:none}
+  .stat small{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}
+  tr.has-note{cursor:pointer}
+  tr.has-note:hover td{background:color-mix(in srgb, var(--faint) 40%, transparent)}
+  .notebtn{font-family:var(--mono);font-size:12px;color:var(--accent);white-space:nowrap}
+  tr.note-row td{white-space:normal;font-family:var(--serif);font-size:16px;line-height:1.55;color:var(--ink);background:var(--bg);padding:14px 18px 16px}
+  tr.note-row p{margin:0 0 8px;max-width:760px}
+
   /* Home performance chart */
   .small{font-size:14px}
   .perf-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:8px}
@@ -194,6 +206,12 @@
     <h2>Portfolio</h2>
     <p class="note">Positions I've taken, with entry and exit prices. Returns are per position, in % only. Not investment advice.</p>
     <div class="stats" id="stats"></div>
+    <h2>Risk vs the S&amp;P 500</h2>
+    <div class="tbl riskwrap"><table class="risk" id="risk"></table></div>
+    <p class="note small" id="riskNote"></p>
+    <h2>Trade record</h2>
+    <div class="stats" id="tradeStats"></div>
+    <h2>All positions</h2>
     <div class="filters" id="filters">
       <button data-f="all" class="on">All</button>
       <button data-f="open">Open</button>
@@ -219,7 +237,7 @@
   <!-- ================= CONTACT ================= -->
   <section id="contact" hidden>
     <h2>Contact</h2>
-    <p>The easiest way to reach me is by email. I'm happy to talk about markets, research, or anything on this site.</p>
+    <p>The easiest way to reach me is by email. If you would like the data behind any of my research, a copy of my CV, or have any questions about my work, feel free to get in touch. I'm always happy to talk about markets and research.</p>
     <dl class="contact">
       <dt>Email</dt><dd><a href="mailto:victor.auberger@edu.escp.eu">victor.auberger@edu.escp.eu</a></dd>
       <dt>X</dt><dd><a href="https://x.com/victor_auberger">@victor_auberger</a></dd>
@@ -397,7 +415,7 @@ async function load(){
     const ret = raw == null ? null : raw * lev;
     return {...p, lev, isOpen, px, ret, held: days(p.entryDate, isOpen ? asOf : p.exitDate)};
   });
-  renderStats(); renderTable(); renderHoldings(); drawChart();
+  renderStats(); renderTable(); renderHoldings(); drawChart(); renderRisk(); renderTradeStats();
   const upd = PRICES.updated ? new Date(PRICES.updated) : null;
   const when = upd ? upd.toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "–";
   const sample = PRICES.sample ? '<span class="sample">sample data</span>' : "";
@@ -521,6 +539,61 @@ function drawChart(){
 }
 let rsz; window.addEventListener("resize", () => { clearTimeout(rsz); rsz = setTimeout(drawChart, 120); });
 
+// ---------- Risk statistics (from the daily performance series) ----------
+function riskStats(series, col){
+  const pts = series.filter(d => d[0].endsWith("23:59") && d[col] != null);
+  if (pts.length < 20) return null;
+  const v = pts.map(d => 1 + d[col]);
+  const r = v.slice(1).map((x, i) => x / v[i] - 1);
+  const n = r.length, mean = r.reduce((a, b) => a + b, 0) / n;
+  const sd = Math.sqrt(r.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1));
+  const years = (new Date(pts[pts.length-1][0]) - new Date(series[0][0])) / (365.25 * 864e5);
+  const total = v[v.length-1] - 1;
+  let peak = 1, mdd = 0; v.forEach(x => { peak = Math.max(peak, x); mdd = Math.min(mdd, x / peak - 1); });
+  return {r, total, cagr: Math.pow(1 + total, 1 / years) - 1, vol: sd * Math.sqrt(252),
+          sharpe: sd ? (mean * 252) / (sd * Math.sqrt(252)) : null, mdd, worst: Math.min(...r), best: Math.max(...r)};
+}
+function renderRisk(){
+  const S = PRICES.series || [];
+  const P = riskStats(S, 1), B = riskStats(S, 2);
+  if (!P){ $("#risk").innerHTML = `<tr><td class="open">Not enough history yet.</td></tr>`; return; }
+  let beta = null, corr = null;
+  if (B && B.r.length === P.r.length){
+    const n = P.r.length, mp = P.r.reduce((a,b)=>a+b,0)/n, mb = B.r.reduce((a,b)=>a+b,0)/n;
+    let cov = 0, vb = 0, vp = 0;
+    for (let i = 0; i < n; i++){ cov += (P.r[i]-mp)*(B.r[i]-mb); vb += (B.r[i]-mb)**2; vp += (P.r[i]-mp)**2; }
+    beta = cov / vb; corr = cov / Math.sqrt(vb * vp);
+  }
+  const f2 = x => x == null ? "–" : (x < 0 ? "−" : "") + Math.abs(x).toFixed(2);
+  const rows = [
+    ["Total return", pct(P.total), B ? pct(B.total) : "–"],
+    ["Annualised return", pct(P.cagr), B ? pct(B.cagr) : "–"],
+    ["Volatility (annualised)", pct(P.vol).replace("+",""), B ? pct(B.vol).replace("+","") : "–"],
+    ["Sharpe ratio (0% risk-free)", f2(P.sharpe), B ? f2(B.sharpe) : "–"],
+    ["Maximum drawdown", pct(P.mdd), B ? pct(B.mdd) : "–"],
+    ["Worst day", pct(P.worst), B ? pct(B.worst) : "–"],
+    ["Beta to the S&P 500", f2(beta), "1.00"],
+    ["Correlation with the S&P 500", f2(corr), "1.00"],
+  ];
+  $("#risk").innerHTML = `<tr><th></th><th>Portfolio</th><th>${esc(PRICES.benchmarkName || "S&P 500")}</th></tr>` +
+    rows.map(([l, a, b]) => `<tr><td>${l}</td><td>${a}</td><td>${b}</td></tr>`).join("");
+  $("#riskNote").textContent = `From daily returns since ${fmtD(S[0][0])}. Days with no open position count as invested in the S&P 500, which pulls beta and correlation towards 1.`;
+}
+function renderTradeStats(){
+  const closed = rows.filter(r => !r.isOpen && r.ret != null);
+  if (!closed.length){ $("#tradeStats").innerHTML = ""; return; }
+  const best = closed.reduce((a, b) => b.ret > a.ret ? b : a), worst = closed.reduce((a, b) => b.ret < a.ret ? b : a);
+  const hit = side => { const c = closed.filter(r => r.side === side); return c.length ? `${Math.round(c.filter(r => r.ret > 0).length / c.length * 100)}%` : "–"; };
+  const n = side => closed.filter(r => r.side === side).length;
+  const held = Math.round(closed.reduce((a, r) => a + r.held, 0) / closed.length);
+  $("#tradeStats").innerHTML = [
+    [`<span class="up">${pct(best.ret)}</span>`, "Best trade", `${esc(best.name.replace(/ \(.*\)$/, ""))} · ${fmtDs(best.entryDate)}`],
+    [`<span class="down">${pct(worst.ret)}</span>`, "Worst trade", `${esc(worst.name.replace(/ \(.*\)$/, ""))} · ${fmtDs(worst.entryDate)}`],
+    [hit("long") + " / " + hit("short"), "Hit rate long / short", `${n("long")} longs, ${n("short")} shorts closed`],
+    [held + " days", "Average holding period", `${closed.length} closed trades`],
+  ].map(([v, l, sub]) => `<div class="stat"><b>${v}</b><span>${l}</span><small>${sub}</small></div>`).join("");
+}
+
 // ---------- Portfolio page ----------
 function renderStats(){
   const closed = rows.filter(r => !r.isOpen);
@@ -543,9 +616,9 @@ function renderTable(){
   let list = rows.filter(r => filter==="all" || (filter==="open"&&r.isOpen) || (filter==="closed"&&!r.isOpen) || r.side===filter);
   list.sort((a,b) => { const x=a[sortKey], y=b[sortKey]; return (x>y?1:x<y?-1:0) * sortDir; });
   const head = `<tr>${COLS.map(([k,l,n]) => `<th class="${n?'num':''}" data-k="${k}">${l}${sortKey===k?(sortDir>0?" ↑":" ↓"):""}</th>`).join("")}</tr>`;
-  const body = list.map(r => `<tr>
+  const body = list.map((r, i) => `<tr class="${r.note ? "has-note" : ""}" data-i="${i}">
     <td><span class="tick">${esc(r.ticker)}</span><span class="co">${esc(r.name.replace(/ \(.*\)$/, ""))}</span></td>
-    <td class="thesis">${esc(r.thesis || "")}</td>
+    <td class="thesis">${esc(r.thesis || "")}${r.note ? `${r.thesis ? "<br>" : ""}<span class="notebtn">Write-up ↓</span>` : ""}</td>
     <td><span class="pill ${r.side}">${r.side.toUpperCase()}</span></td>
     <td class="${r.lev > 1 ? "" : "open"}">${r.lev > 1 ? r.lev + "×" : "No"}</td>
     <td>${fmtDs(r.entryDate)}</td>
@@ -554,8 +627,12 @@ function renderTable(){
     <td class="num">${r.px == null ? "–" : cur(r) + fmtP(r.px)}${r.isOpen?'<span class="co">last</span>':''}</td>
     <td class="num">${r.held}</td>
     <td class="num ${cls(r.ret)}">${pct(r.ret)}</td>
-  </tr>`).join("");
+  </tr>${r.note ? `<tr class="note-row" data-for="${i}" hidden><td colspan="10">${String(r.note).split(/\n\s*\n/).map(x => `<p>${esc(x)}</p>`).join("")}</td></tr>` : ""}`).join("");
   $("#pf").innerHTML = head + (body || `<tr><td colspan="10" class="open">No positions.</td></tr>`);
+  $("#pf").querySelectorAll("tr.has-note").forEach(tr => tr.onclick = () => {
+    const n = $("#pf").querySelector(`tr.note-row[data-for="${tr.dataset.i}"]`);
+    n.hidden = !n.hidden; const btn = tr.querySelector(".notebtn"); if (btn) btn.textContent = n.hidden ? "Write-up ↓" : "Hide ↑";
+  });
   $("#pf").querySelectorAll("th").forEach(th => th.onclick = () => {
     const k = th.dataset.k; sortDir = sortKey===k ? -sortDir : -1; sortKey = k; renderTable();
   });

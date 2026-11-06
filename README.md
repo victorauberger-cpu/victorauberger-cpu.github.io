@@ -19,6 +19,7 @@ Copy a line, change the values, and keep the comma between lines:
 ```
 - `ticker` must be the **Yahoo Finance** symbol: `AAPL`, `MC.PA` (Paris), `SAP.DE` (Xetra), `VOD.L` (London)…
 - `side`: `"long"` or `"short"`
+- `thesis`: one short line shown in the table. `note` (optional): a longer write-up, shown when visitors click the row. Separate paragraphs with `\n\n`.
 - Dates are `YYYY-MM-DD`. Leave `"exitDate": ""` and `"exit": null` while the position is open.
 - **Closing a trade:** fill in `exitDate` and `exit`.
 
@@ -33,4 +34,4 @@ Copy a line, change the values, and keep the comma between lines:
 You can also trigger it from the **Actions** tab → *Update prices & deploy* → **Run workflow**.
 
 Prices are delayed (Yahoo's free data is ~15 min behind, plus up to 30 min between updates).
-The chart weights each position by its "weight" (its % of the money invested at the time; amounts are never stored). Leave it out and positions count equally.
+The chart weights each position by its size, stored privately in the GitHub secret POSITION_SIZES (Settings → Secrets and variables → Actions), never in the public files. Trades without a size count as a typical position.
