@@ -33,5 +33,6 @@
   {"ticker": "PLTR", "name": "Palantir Technologies", "side": "short", "entryDate": "2026-11-04", "entry": 175.3, "exitDate": "2026-11-05", "exit": 154.99, "leverage": 1, "thesis": ""},
   {"ticker": "NFLX", "name": "Netflix", "side": "long", "entryDate": "2026-11-05", "entry": 67.28, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
   {"ticker": "SAN", "name": "Banco Santander (ADR)", "side": "long", "entryDate": "2026-11-05", "entry": 12.24, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
-  {"ticker": "ONON", "name": "On Holding", "side": "long", "entryDate": "2026-11-05", "entry": 37.54, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""}
+  {"ticker": "ONON", "name": "On Holding", "side": "long", "entryDate": "2026-11-05", "entry": 37.54, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
+  {"ticker": "DNUT", "name": "Krispy Kreme", "side": "short", "entryDate": "2026-11-06", "entry": 3.87, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""}
 ]
