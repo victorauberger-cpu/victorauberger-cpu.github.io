@@ -37,5 +37,5 @@
   {"ticker": "DNUT", "name": "Krispy Kreme", "side": "short", "entryDate": "2026-11-06", "entry": 3.87, "exitDate": "2026-11-06", "exit": 4.0, "leverage": 1, "thesis": ""},
   {"ticker": "DNUT", "name": "Krispy Kreme", "side": "long", "entryDate": "2026-11-06", "entry": 4.0, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
   {"ticker": "NVDA", "name": "Nvidia", "side": "short", "entryDate": "2026-11-08", "entry": 180.64, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
-  {"ticker": "PURR", "name": "Hyperliquid Strategies", "side": "short", "entryDate": "2026-11-09", "entry": 8.65, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""}
+  {"ticker": "PURR", "name": "Hyperliquid Strategies", "side": "short", "entryDate": "2026-11-09", "entry": 8.65, "exitDate": "2026-11-09", "exit": 8.91, "leverage": 1, "thesis": ""}
 ]
