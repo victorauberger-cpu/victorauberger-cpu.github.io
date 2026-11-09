@@ -162,7 +162,103 @@
     root._redraw = draw;
   }
 
+  // ---------------- live Kalshi panel (data refreshed by the GitHub updater into kalshi.json) ----------------
+  const KCSS = `
+  .klive{border:1px solid var(--faint);border-radius:10px;padding:14px 16px;background:var(--card)}
+  .khead{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .kdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--up);margin-right:7px;vertical-align:1px;animation:kp 1.8s ease-in-out infinite}
+  @keyframes kp{50%{opacity:.25}} @media (prefers-reduced-motion:reduce){.kdot{animation:none}}
+  .kbet{margin:12px 0 4px;min-height:118px;transition:opacity .25s}
+  .kbet.fade{opacity:0}
+  .kcat{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--faint);border-radius:999px;padding:1px 9px;margin-bottom:6px}
+  .kq{font-size:18px;line-height:1.35}
+  .ko{font-size:15px;color:var(--muted);margin-top:2px}
+  .krow{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:10px}
+  .kp{font-family:var(--mono);font-size:32px;line-height:1}
+  .kp small{font-size:13px;color:var(--muted);margin-left:6px}
+  .kmeta{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .kbar{height:6px;border-radius:3px;background:var(--faint);overflow:hidden;margin-top:10px}
+  .kbar i{display:block;height:100%;background:var(--s1);transition:width .6s cubic-bezier(.2,.7,.2,1)}
+  .kbtns{display:flex;gap:14px;align-items:center;margin-top:12px;font-family:var(--mono);font-size:12px}
+  .kbtns button{font:inherit;background:none;border:1px solid var(--faint);color:var(--ink);border-radius:999px;padding:4px 12px;cursor:pointer}
+  .kbtns button:hover{border-color:var(--muted)}
+  .kmix{margin-top:18px;padding-top:14px;border-top:1px solid var(--faint)}
+  .kmix .vtitle{margin-bottom:8px}
+  .kstack{display:flex;height:22px;border-radius:5px;overflow:hidden;gap:2px}
+  .kstack span{display:block;height:100%;transition:flex-grow .7s cubic-bezier(.2,.7,.2,1)}
+  .kleg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .kleg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:0}
+  .kline{font-size:15px;margin-top:10px;line-height:1.45}`;
+  function kalshiFile(){
+    const tries = ["kalshi.json", "data/kalshi.json"];
+    return (function next(i){
+      if (i >= tries.length) return Promise.reject(new Error("no kalshi.json"));
+      return fetch(tries[i] + "?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : Promise.reject()).catch(() => next(i + 1));
+    })(0);
+  }
+  const ago = iso => { const m = Math.max(0, Math.round((Date.now() - new Date(iso)) / 60000));
+    return m < 2 ? "just now" : m < 60 ? m + " min ago" : m < 1440 ? Math.round(m / 60) + " h ago" : Math.round(m / 1440) + " d ago"; };
+  const fmtN = n => n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + "M" : n >= 1e4 ? Math.round(n / 1e3) + "k" : n.toLocaleString("en-US");
+  const closes = iso => { if (!iso) return ""; const d = new Date(iso), days = (d - Date.now()) / 864e5;
+    if (days > 3650) return "no fixed end date";
+    return "closes " + d.toLocaleDateString("en-GB", {day: "numeric", month: "short", year: days > 300 ? "numeric" : undefined}); };
+
+  function kalshiPanel(root, k, f){
+    if (!document.getElementById("kcss")){ const st = document.createElement("style"); st.id = "kcss"; st.textContent = KCSS; document.head.appendChild(st); }
+    const ms = k.markets || [];
+    const tot = k.volume24h || 1, cats = k.byCategory || [];
+    const sports = (cats.find(c => c[0] === "Sports") || [0, 0])[1] / tot * 100;
+    const pal = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--accent)", "var(--bench)"];
+    const shown = cats.slice(0, 5), rest = cats.slice(5).reduce((a, c) => a + c[1], 0);
+    const segs = shown.map((c, i) => [c[0], c[1], pal[i]]).concat(rest > 0 ? [["Other", rest, "var(--faint)"]] : []);
+    root.innerHTML = `<div class="klive">
+      <div class="khead"><span><span class="kdot"></span>Live on Kalshi · a random market</span><span title="${E(k.updated)}">updated ${ago(k.updated)}</span></div>
+      <div class="kbet"></div>
+      <div class="kbtns"><button type="button" class="knext">Show another ↻</button><a class="kgo" target="_blank" rel="noopener">See it on Kalshi ↗</a></div>
+      <div class="kmix">
+        <div class="vtitle">What Kalshi traded in the last 24 hours, by category</div>
+        <div class="kstack">${segs.map(s => `<span style="flex-grow:0;background:${s[2]}" data-g="${s[1]}" title="${E(s[0])}: ${(s[1] / tot * 100).toFixed(1)}%"></span>`).join("")}</div>
+        <div class="kleg">${segs.map(s => `<span><i style="background:${s[2]}"></i>${E(s[0])} ${(s[1] / tot * 100).toFixed(s[1] / tot < .01 ? 1 : 0)}%</span>`).join("")}</div>
+        <p class="kline">Right now <b>${sports.toFixed(0)}%</b> of the ${fmtN(k.volume24h)} contracts traded on Kalshi in the past day were on sports. The paper measured <b>79%</b> across Kalshi and Polymarket in July 2026, and argues that this much sport is sports betting under another name, so it should face the same taxes and age limits as sportsbooks.</p>
+      </div></div>
+      <p class="vexplain">Pulled from Kalshi's public API by this site's updater every 15 minutes on weekdays${k.complete === false ? " (partial scan)" : ""}. Prices are the midpoint between the best bid and ask, read as the market's probability of “Yes”. Not a recommendation. <span class="vsrc">Source: Kalshi; paper's figure from Figure 2.</span></p>`;
+    requestAnimationFrame(() => requestAnimationFrame(() => root.querySelectorAll(".kstack span").forEach(s => s.style.flexGrow = s.dataset.g)));
+
+    const box = root.querySelector(".kbet"), go = root.querySelector(".kgo");
+    let last = -1;
+    function pick(){
+      if (!ms.length){ box.innerHTML = `<div class="ko">No live markets in the latest snapshot.</div>`; go.hidden = true; return; }
+      let i; do { i = Math.floor(Math.random() * ms.length); } while (ms.length > 1 && i === last);
+      last = i; const m = ms[i], pct = Math.round(m.p * 100);
+      const chg = m.chg == null || Math.abs(m.chg) < 0.005 ? "" :
+        `<span style="color:var(${m.chg > 0 ? "--up" : "--down"})">${m.chg > 0 ? "▲" : "▼"} ${Math.abs(Math.round(m.chg * 100))} pt${Math.abs(Math.round(m.chg * 100)) === 1 ? "" : "s"}</span> since yesterday · `;
+      box.classList.add("fade");
+      setTimeout(() => {
+        box.innerHTML = `<span class="kcat">${E(m.cat)}</span>
+          <div class="kq">${E(m.q)}</div>${m.o ? `<div class="ko">Outcome: ${E(m.o)}</div>` : ""}
+          <div class="krow"><div class="kp">${pct}%<small>chance of Yes</small></div>
+          <div class="kmeta">${chg}${fmtN(m.v24)} contracts in 24h · ${closes(m.close)}</div></div>
+          <div class="kbar"><i style="width:0"></i></div>`;
+        go.href = m.url; go.hidden = false;
+        box.classList.remove("fade");
+        requestAnimationFrame(() => requestAnimationFrame(() => { const b = box.querySelector(".kbar i"); if (b) b.style.width = pct + "%"; }));
+      }, box.innerHTML ? 200 : 0);
+    }
+    root.querySelector(".knext").addEventListener("click", pick);
+    pick();
+  }
+
   window.renderFinding = function(el, f){
+    if (f.live === "kalshi"){
+      el.innerHTML = `<div class="kstats">${f.stats.map(s => `<div class="kstat"><b>${E(s.v)}</b><span>${E(s.l)}</span></div>`).join("")}</div><div class="kwrap"></div>`;
+      const w = el.querySelector(".kwrap");
+      kalshiFile().then(k => kalshiPanel(w, k, f)).catch(() => { el.innerHTML = ""; drawFinding(el, Object.assign({}, f, {live: null})); });
+      return;
+    }
+    drawFinding(el, f);
+  };
+
+  function drawFinding(el, f){
     el.innerHTML = `<div class="kstats">${f.stats.map(s => `<div class="kstat"><b>${E(s.v)}</b><span>${E(s.l)}</span></div>`).join("")}</div>
       <div class="vchart"></div>
       <p class="vexplain">${f.chart.explain || ""} <span class="vsrc">Source: ${E(f.chart.source)}.</span></p>`;
@@ -173,5 +269,5 @@
       io.observe(c);
     } else c._intro && c._intro();
     let t; window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => c._redraw && c._redraw(), 150); });
-  };
+  }
 })();

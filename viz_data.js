@@ -3,6 +3,7 @@
 const FINDINGS = {
 
   "Betting on Everything": {
+    live: "kalshi",   // shows a live random Kalshi market + today's sports share; falls back to the chart below if kalshi.json is missing
     stats: [
       {v: "$0.79bn → $40bn", l: "Kalshi's valuation, autumn 2024 to October 2026"},
       {v: "79%", l: "of Kalshi and Polymarket volume in July 2026 was sports"},
