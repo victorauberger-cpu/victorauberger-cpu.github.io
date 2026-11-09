@@ -177,7 +177,102 @@ def apply_private_sizes(positions):
     print(f"Private sizes applied to {found} of {len(positions)} trades")  # counts only, never the sizes
 
 
+# ---------------- Live Kalshi snapshot (for the prediction-markets paper on the Research page) ----------------
+KALSHI_API = "https://api.elections.kalshi.com/trade-api/v2"
+KALSHI_OUT = DATA / "kalshi.json"
+
+
+def _num(x):
+    try:
+        return float(x)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def update_kalshi(max_pages=120, budget_s=120):
+    """Scans Kalshi's open events (public API, no key) and writes kalshi.json with the most-traded live
+    markets plus the share of the last 24h of contracts traded in each category."""
+    import time
+    import urllib.parse
+    import urllib.request
+
+    t0, cursor, pages = time.time(), "", 0
+    by_cat, markets, scanned = {}, [], 0
+    while pages < max_pages and time.time() - t0 < budget_s:
+        q = {"status": "open", "with_nested_markets": "true", "limit": "200"}
+        if cursor:
+            q["cursor"] = cursor
+        req = urllib.request.Request(f"{KALSHI_API}/events?" + urllib.parse.urlencode(q),
+                                     headers={"User-Agent": "personal-site-updater", "Accept": "application/json"})
+        data = None
+        for attempt in range(3):
+            try:
+                with urllib.request.urlopen(req, timeout=30) as r:
+                    data = json.load(r)
+                break
+            except Exception as e:
+                print(f"Kalshi page {pages} attempt {attempt + 1} failed: {e}")
+                time.sleep(2 * (attempt + 1))
+        if data is None:
+            break
+        pages += 1
+        for ev in data.get("events") or []:
+            cat = ev.get("category") or "Other"
+            ms = ev.get("markets") or []
+            for m in ms:
+                if m.get("status") != "active":
+                    continue
+                scanned += 1
+                vol = _num(m.get("volume_24h_fp", m.get("volume_24h")))
+                by_cat[cat] = by_cat.get(cat, 0.0) + vol
+                if vol <= 0 or m.get("ticker", "").startswith("KXMVE"):
+                    continue   # skip dead markets and auto-generated parlay combos
+                bid, ask = _num(m.get("yes_bid_dollars")), _num(m.get("yes_ask_dollars"))
+                last = _num(m.get("last_price_dollars"))
+                p = (bid + ask) / 2 if bid > 0 and ask > 0 and ask - bid <= 0.10 else last
+                if not 0.03 <= p <= 0.97:
+                    continue   # near-certain outcomes are dull to show
+                title, sub = (m.get("title") or ev.get("title") or "").strip(), (m.get("yes_sub_title") or "").strip()
+                if len(ms) > 1 and sub:
+                    question, outcome = (ev.get("title") or title).strip(), sub
+                else:
+                    question, outcome = title, ""
+                markets.append({"ev": ev.get("event_ticker"),
+                    "q": question, "o": outcome, "p": round(p, 3), "chg": round(p - _num(m.get("previous_price_dollars")), 3)
+                    if _num(m.get("previous_price_dollars")) > 0 else None,
+                    "v24": round(vol), "cat": cat, "close": m.get("close_time"),
+                    "url": "https://kalshi.com/markets/" + (ev.get("series_ticker") or m.get("event_ticker", "")).lower(),
+                })
+        cursor = data.get("cursor") or ""
+        if not cursor:
+            break
+        time.sleep(0.1)
+    if scanned == 0:
+        print("Kalshi: nothing fetched; keeping the previous kalshi.json")
+        return
+    markets.sort(key=lambda x: -x["v24"])
+    seen, top = set(), []
+    for m in markets:              # one market per event, so the random pick varies
+        if m["ev"] not in seen:
+            seen.add(m["ev"])
+            top.append({k: v for k, v in m.items() if k != "ev"})
+    total = sum(by_cat.values())
+    KALSHI_OUT.write_text(json.dumps({
+        "updated": datetime.now(timezone.utc).isoformat(timespec="minutes"),
+        "complete": not cursor,             # False if the scan stopped before the last page
+        "marketsScanned": scanned,
+        "volume24h": round(total),
+        "byCategory": sorted([[c, round(v)] for c, v in by_cat.items() if v > 0], key=lambda x: -x[1]),
+        "markets": top[:150],
+    }, separators=(",", ":")))
+    print(f"Kalshi: {scanned} markets on {pages} pages, {len(top)} live events, wrote {KALSHI_OUT.name}")
+
+
 def main():
+    try:
+        update_kalshi()
+    except Exception as e:   # never let Kalshi break the price update
+        print(f"Kalshi update failed: {e}")
     positions = json.loads(POSITIONS.read_text())
     apply_private_sizes(positions)
     settings = json.loads(SETTINGS.read_text()) if SETTINGS.exists() else {}
