@@ -35,5 +35,6 @@
   {"ticker": "SAN", "name": "Banco Santander (ADR)", "side": "long", "entryDate": "2026-11-05", "entry": 12.24, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
   {"ticker": "ONON", "name": "On Holding", "side": "long", "entryDate": "2026-11-05", "entry": 37.54, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
   {"ticker": "DNUT", "name": "Krispy Kreme", "side": "short", "entryDate": "2026-11-06", "entry": 3.87, "exitDate": "2026-11-06", "exit": 4.0, "leverage": 1, "thesis": ""},
-  {"ticker": "DNUT", "name": "Krispy Kreme", "side": "long", "entryDate": "2026-11-06", "entry": 4.0, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""}
+  {"ticker": "DNUT", "name": "Krispy Kreme", "side": "long", "entryDate": "2026-11-06", "entry": 4.0, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
+  {"ticker": "NVDA", "name": "Nvidia", "side": "short", "entryDate": "2026-11-08", "entry": 186.64, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""}
 ]
