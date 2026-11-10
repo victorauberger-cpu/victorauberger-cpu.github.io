@@ -31,13 +31,13 @@
   {"ticker": "MRVL", "name": "Marvell Technology", "side": "short", "entryDate": "2026-11-04", "entry": 163.18, "exitDate": "2026-11-05", "exit": 133.55, "leverage": 1, "thesis": ""},
   {"ticker": "CIFR", "name": "Cipher Digital", "side": "short", "entryDate": "2026-11-04", "entry": 6.7, "exitDate": "2026-11-05", "exit": 5.55, "leverage": 1, "thesis": ""},
   {"ticker": "PLTR", "name": "Palantir Technologies", "side": "short", "entryDate": "2026-11-04", "entry": 175.3, "exitDate": "2026-11-05", "exit": 154.99, "leverage": 1, "thesis": ""},
-  {"ticker": "NFLX", "name": "Netflix", "side": "long", "entryDate": "2026-11-05", "entry": 67.28, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
-  {"ticker": "SAN", "name": "Banco Santander (ADR)", "side": "long", "entryDate": "2026-11-05", "entry": 12.24, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
-  {"ticker": "ONON", "name": "On Holding", "side": "long", "entryDate": "2026-11-05", "entry": 37.54, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
+  {"ticker": "NFLX", "name": "Netflix", "side": "long", "entryDate": "2026-11-05", "entry": 67.28, "exitDate": "2026-11-10", "exit": 63.02, "leverage": 1, "thesis": ""},
+  {"ticker": "SAN", "name": "Banco Santander (ADR)", "side": "long", "entryDate": "2026-11-05", "entry": 12.24, "exitDate": "2026-11-10", "exit": 12.615, "leverage": 1, "thesis": ""},
+  {"ticker": "ONON", "name": "On Holding", "side": "long", "entryDate": "2026-11-05", "entry": 37.54, "exitDate": "2026-11-10", "exit": 34.505, "leverage": 1, "thesis": ""},
   {"ticker": "DNUT", "name": "Krispy Kreme", "side": "short", "entryDate": "2026-11-06", "entry": 3.87, "exitDate": "2026-11-06", "exit": 4.0, "leverage": 1, "thesis": ""},
-  {"ticker": "DNUT", "name": "Krispy Kreme", "side": "long", "entryDate": "2026-11-06", "entry": 4.0, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
+  {"ticker": "DNUT", "name": "Krispy Kreme", "side": "long", "entryDate": "2026-11-06", "entry": 4.0, "exitDate": "2026-11-10", "exit": 3.955, "leverage": 1, "thesis": ""},
   {"ticker": "NVDA", "name": "Nvidia", "side": "short", "entryDate": "2026-11-09", "entry": 180.64, "exitDate": "2026-11-09", "exit": 178.67, "leverage": 1, "thesis": ""},
   {"ticker": "PURR", "name": "Hyperliquid Strategies", "side": "short", "entryDate": "2026-11-09", "entry": 8.65, "exitDate": "2026-11-09", "exit": 8.91, "leverage": 1, "thesis": ""},
-  {"ticker": "9984.T", "name": "SoftBank Group", "side": "long", "entryDate": "2026-11-10", "entry": 3776, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""},
-  {"ticker": "PYPL", "name": "PayPal", "side": "long", "entryDate": "2026-11-10", "entry": 60.05, "exitDate": "", "exit": null, "leverage": 1, "thesis": ""}
+  {"ticker": "9984.T", "name": "SoftBank Group", "side": "long", "entryDate": "2026-11-10", "entry": 3776, "exitDate": "2026-11-10", "exit": 3872, "leverage": 1, "thesis": ""},
+  {"ticker": "PYPL", "name": "PayPal", "side": "long", "entryDate": "2026-11-10", "entry": 60.05, "exitDate": "2026-11-10", "exit": 58.76, "leverage": 1, "thesis": ""}
 ]
