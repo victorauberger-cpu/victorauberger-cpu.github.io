@@ -1,0 +1,131 @@
+{
+ "_help": "Edit this file to run the paper fund. To record a fill, change 'entry'. To close a position, fill 'exitDate' (YYYY-MM-DD) and 'exit' (price). Stops are recalculated automatically from the risk rules unless you add a 'stop' field.",
+ "name": "Global Long/Short Equity",
+ "status": "Simulated portfolio",
+ "start": "2026-11-11",
+ "end": "2027-11-11",
+ "cashRate": 0.025,
+ "runningCost": 0.0264,
+ "fx": {
+  "USD": "EURUSD=X",
+  "GBP": "EURGBP=X",
+  "CHF": "EURCHF=X",
+  "KRW": "EURKRW=X"
+ },
+ "rules": {
+  "maxLossLong": 0.015,
+  "maxLossShort": 0.0125,
+  "ddHalve": -0.05,
+  "ddClose": -0.075,
+  "grossMax": 3.0,
+  "betaBand": 0.1,
+  "singleLongMax": 0.2,
+  "singleShortMax": 0.12
+ },
+ "pairs": {
+  "P1": {
+   "title": "US internet",
+   "why": "Profitable platforms vs loss-making peers."
+  },
+  "P2": {
+   "title": "US services",
+   "why": "Strong balance sheets vs weak ones."
+  },
+  "P3": {
+   "title": "European travel",
+   "why": "Airport operator vs leveraged airline and travel retailer."
+  },
+  "P4": {
+   "title": "European consumer & services",
+   "why": "Quality franchises vs over-levered names."
+  },
+  "P5": {
+   "title": "European healthcare",
+   "why": "Growth at a fair price vs stretched valuation."
+  },
+  "P6": {
+   "title": "Korea consumer",
+   "why": "Unhedged; small, low-beta position."
+  },
+  "H": {
+   "title": "Index hedge",
+   "why": "Short EURO STOXX 50 futures against residual European beta."
+  }
+ },
+ "facts": [
+  [
+   "Strategy",
+   "Equity long/short, beta-neutral"
+  ],
+  [
+   "Inception",
+   "11 Nov 2026"
+  ],
+  [
+   "Base currency",
+   "EUR"
+  ],
+  [
+   "Benchmark",
+   "Cash (ECB deposit rate)"
+  ],
+  [
+   "Broker",
+   "Interactive Brokers (simulated)"
+  ],
+  [
+   "Margin",
+   "Portfolio margin"
+  ]
+ ],
+ "costs": [
+  [
+   "Net financing (margin interest less interest on cash)",
+   -0.0092
+  ],
+  [
+   "Stock borrow fees",
+   -0.0042
+  ],
+  [
+   "Dividends received less dividends paid on shorts",
+   0.008
+  ],
+  [
+   "Commissions, spreads and transaction taxes",
+   -0.017
+  ],
+  [
+   "Futures roll and carry",
+   -0.001
+  ],
+  [
+   "Market data",
+   -0.003
+  ]
+ ],
+ "financing": "Financed at Interactive Brokers Pro rates; the book runs under portfolio margin.",
+ "positions": [
+  {"id": "L1", "ticker": "GOOGL", "exchange": "", "yahoo": "GOOGL", "name": "Alphabet", "type": "stock", "side": "long", "pair": "P1", "region": "US", "currency": "USD", "unit": 1, "weight": 0.2, "beta": 1.226, "entryDate": "2026-11-11", "entry": 287.755, "exitDate": "", "exit": null, "hedge": "Hedged – P1", "thesis": "Market-leading franchise at c. 15× earnings after a capex-driven sell-off.", "wrongIf": "AI capex, search competition, antitrust."},
+  {"id": "L2", "ticker": "NFLX", "exchange": "", "yahoo": "NFLX", "name": "Netflix", "type": "stock", "side": "long", "pair": "P1", "region": "US", "currency": "USD", "unit": 1, "weight": 0.12, "beta": 1.606, "entryDate": "2026-11-11", "entry": 62.635, "exitDate": "", "exit": null, "hedge": "Hedged – P1", "thesis": "Cash-generative subscription leader at a reasonable multiple.", "wrongIf": "Advertising growth, content costs, competition for viewing time."},
+  {"id": "S1", "ticker": "SNOW", "exchange": "", "yahoo": "SNOW", "name": "Snowflake", "type": "stock", "side": "short", "pair": "P1", "region": "US", "currency": "USD", "unit": 1, "weight": 0.12, "beta": 1.322, "entryDate": "2026-11-11", "entry": 296.75, "exitDate": "", "exit": null, "hedge": "Hedged – P1", "thesis": "Loss-making; valuation assumes profitability not yet visible.", "wrongIf": "Strong revenue growth; results on 2 Dec."},
+  {"id": "S2", "ticker": "RBLX", "exchange": "", "yahoo": "RBLX", "name": "Roblox", "type": "stock", "side": "short", "pair": "P1", "region": "US", "currency": "USD", "unit": 1, "weight": 0.1, "beta": 1.534, "entryDate": "2026-11-11", "entry": 50.23, "exitDate": "", "exit": null, "hedge": "Hedged – P1", "thesis": "Bookings declining while the business remains loss-making.", "wrongIf": "Engagement rebound; crowded short."},
+  {"id": "L3", "ticker": "LDOS", "exchange": "", "yahoo": "LDOS", "name": "Leidos", "type": "stock", "side": "long", "pair": "P2", "region": "US", "currency": "USD", "unit": 1, "weight": 0.15, "beta": 0.545, "entryDate": "2026-11-11", "entry": 137.55, "exitDate": "", "exit": null, "hedge": "Hedged – P2", "thesis": "Lowest valuation in the US book, with guidance recently raised.", "wrongIf": "US budget delays and contract recompetes."},
+  {"id": "L4", "ticker": "INFY", "exchange": "", "yahoo": "INFY", "name": "Infosys (ADR)", "type": "stock", "side": "long", "pair": "P2", "region": "US", "currency": "USD", "unit": 1, "weight": 0.12, "beta": 0.02, "entryDate": "2026-11-11", "entry": 12.39, "exitDate": "", "exit": null, "hedge": "Hedged – P2", "thesis": "High-return, debt-free IT services at a discount to its history.", "wrongIf": "Weak IT spending and AI pressure on services pricing."},
+  {"id": "S3", "ticker": "CARR", "exchange": "", "yahoo": "CARR", "name": "Carrier Global", "type": "stock", "side": "short", "pair": "P2", "region": "US", "currency": "USD", "unit": 1, "weight": 0.08, "beta": 1.333, "entryDate": "2026-11-11", "entry": 52.38, "exitDate": "", "exit": null, "hedge": "Hedged – P2", "thesis": "Weak residential demand and a stretched balance sheet.", "wrongIf": "Data-centre cooling demand."},
+  {"id": "S4", "ticker": "AAL", "exchange": "", "yahoo": "AAL", "name": "American Airlines", "type": "stock", "side": "short", "pair": "P2", "region": "US", "currency": "USD", "unit": 1, "weight": 0.08, "beta": 1.447, "entryDate": "2026-11-11", "entry": 14.08, "exitDate": "", "exit": null, "hedge": "Hedged – P2", "thesis": "Losses, high leverage and rising fuel costs.", "wrongIf": "Falling oil prices; high short interest."},
+  {"id": "L5", "ticker": "AENA", "exchange": "BME", "yahoo": "AENA.MC", "name": "Aena", "type": "stock", "side": "long", "pair": "P3", "region": "EU", "currency": "EUR", "unit": 1, "weight": 0.15, "beta": 0.781, "entryDate": "2026-11-11", "entry": 28.96, "exitDate": "", "exit": null, "hedge": "Hedged – P3 + FSXE", "thesis": "Regulated airport monopoly with a clear tariff framework through 2031.", "wrongIf": "Regulated pricing, state ownership, rising capex."},
+  {"id": "S5", "ticker": "WIZZ", "exchange": "LSE", "yahoo": "WIZZ.L", "name": "Wizz Air", "type": "stock", "side": "short", "pair": "P3", "region": "UK", "currency": "GBP", "unit": 100, "weight": 0.08, "beta": 1.936, "entryDate": "2026-11-11", "entry": 1145, "exitDate": "", "exit": null, "hedge": "Hedged – P3 + FSXE", "thesis": "High leverage and falling operating profit.", "wrongIf": "Results on 12 Nov; squeeze risk."},
+  {"id": "S6", "ticker": "AVOL", "exchange": "SIX", "yahoo": "AVOL.SW", "name": "Avolta", "type": "stock", "side": "short", "pair": "P3", "region": "CH", "currency": "CHF", "unit": 1, "weight": 0.1, "beta": 1.022, "entryDate": "2026-11-11", "entry": 49.44, "exitDate": "", "exit": null, "hedge": "Hedged – P3 + FSXE", "thesis": "High debt and thin margins at a full valuation.", "wrongIf": "Travel recovery and deleveraging."},
+  {"id": "L6", "ticker": "MONC", "exchange": "Milan", "yahoo": "MONC.MI", "name": "Moncler", "type": "stock", "side": "long", "pair": "P4", "region": "EU", "currency": "EUR", "unit": 1, "weight": 0.15, "beta": 1.099, "entryDate": "2026-11-11", "entry": 44.53, "exitDate": "", "exit": null, "hedge": "Hedged – P4 + FSXE", "thesis": "Luxury franchise trading below its usual multiple after a 12-month de-rating.", "wrongIf": "Luxury slowdown and tourist flows."},
+  {"id": "L7", "ticker": "NXT", "exchange": "LSE", "yahoo": "NXT.L", "name": "NEXT plc", "type": "stock", "side": "long", "pair": "P4", "region": "UK", "currency": "GBP", "unit": 100, "weight": 0.12, "beta": 1.087, "entryDate": "2026-11-11", "entry": 15655, "exitDate": "", "exit": null, "hedge": "Hedged – P4 + FSXE", "thesis": "Consistent earnings upgrades with high returns on capital.", "wrongIf": "UK consumer spending and cost inflation."},
+  {"id": "L8", "ticker": "RMV", "exchange": "LSE", "yahoo": "RMV.L", "name": "Rightmove", "type": "stock", "side": "long", "pair": "P4", "region": "UK", "currency": "GBP", "unit": 100, "weight": 0.12, "beta": 0.982, "entryDate": "2026-11-11", "entry": 558.2, "exitDate": "", "exit": null, "hedge": "Hedged – P4 + FSXE", "thesis": "Dominant UK property portal with near-50% margins and steady EPS growth.", "wrongIf": "Housing activity and competing portals."},
+  {"id": "L9", "ticker": "LOGN", "exchange": "SIX", "yahoo": "LOGN.SW", "name": "Logitech", "type": "stock", "side": "long", "pair": "P4", "region": "CH", "currency": "CHF", "unit": 1, "weight": 0.12, "beta": 0.608, "entryDate": "2026-11-11", "entry": 80.18, "exitDate": "", "exit": null, "hedge": "Hedged – P4 + FSXE", "thesis": "Strong balance sheet and margins after a 16% share-price decline.", "wrongIf": "Tariffs and consumer-electronics demand."},
+  {"id": "S7", "ticker": "TEF", "exchange": "BME", "yahoo": "TEF.MC", "name": "Telefónica", "type": "stock", "side": "short", "pair": "P4", "region": "EU", "currency": "EUR", "unit": 1, "weight": 0.08, "beta": 0.353, "entryDate": "2026-11-11", "entry": 3.448, "exitDate": "", "exit": null, "hedge": "Hedged – P4 + FSXE", "thesis": "Weak cover and continued losses. Results on 12 Nov.", "wrongIf": "Low valuation; high dividend cost of the short."},
+  {"id": "S8", "ticker": "NEXI", "exchange": "Milan", "yahoo": "NEXI.MI", "name": "Nexi", "type": "stock", "side": "short", "pair": "P4", "region": "EU", "currency": "EUR", "unit": 1, "weight": 0.08, "beta": 1.081, "entryDate": "2026-11-11", "entry": 4.524, "exitDate": "", "exit": null, "hedge": "Hedged – P4 + FSXE", "thesis": "Weak reported profitability. Low conviction, sized accordingly.", "wrongIf": "Rating upgrade and takeover interest."},
+  {"id": "L10", "ticker": "UCB", "exchange": "Brussels", "yahoo": "UCB.BR", "name": "UCB", "type": "stock", "side": "long", "pair": "P5", "region": "EU", "currency": "EUR", "unit": 1, "weight": 0.15, "beta": 0.107, "entryDate": "2026-11-11", "entry": 297.1, "exitDate": "", "exit": null, "hedge": "Hedged – P5 + FSXE", "thesis": "Fast-growing pipeline with guidance recently raised.", "wrongIf": "US drug pricing and a strong run in the shares."},
+  {"id": "S9", "ticker": "SDZ", "exchange": "SIX", "yahoo": "SDZ.SW", "name": "Sandoz", "type": "stock", "side": "short", "pair": "P5", "region": "CH", "currency": "CHF", "unit": 1, "weight": 0.1, "beta": 0.395, "entryDate": "2026-11-11", "entry": 83.74, "exitDate": "", "exit": null, "hedge": "Hedged – P5 + FSXE", "thesis": "Full valuation for a low-margin generics business.", "wrongIf": "Biosimilar growth and margin upgrades."},
+  {"id": "L11", "ticker": "003230", "exchange": "KRX", "yahoo": "003230.KS", "name": "Samyang Foods", "type": "stock", "side": "long", "pair": "P6", "region": "KR", "currency": "KRW", "unit": 1, "weight": 0.1, "beta": 0.117, "entryDate": "2026-11-11", "entry": 1187000, "exitDate": "", "exit": null, "hedge": "Unhedged", "thesis": "Record results with earnings growth well ahead of the share price.", "wrongIf": "Single-brand dependence and export tariffs."},
+  {"id": "H1", "ticker": "FSXE", "exchange": "Eurex, Dec-26", "yahoo": "^STOXX50E", "name": "Micro-EURO STOXX 50 future", "type": "future", "side": "short", "pair": "H", "region": "HEDGE", "currency": "EUR", "unit": 1, "weight": 0.1905, "beta": 1, "entryDate": "2026-11-11", "entry": 6327.87, "exitDate": "", "exit": null, "hedge": "HEDGE", "thesis": "Hedging instrument, sized to keep net European beta close to zero.", "wrongIf": "UK and Swiss stocks are not in the index (basis risk)."}
+ ]
+}

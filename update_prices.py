@@ -268,11 +268,148 @@ def update_kalshi(max_pages=120, budget_s=120):
     print(f"Kalshi: {scanned} markets on {pages} pages, {len(top)} live events, wrote {KALSHI_OUT.name}")
 
 
+# ---------------- Paper fund (fund.json → fund_nav.json) ----------------
+FUND_IN = DATA / "fund.json"
+FUND_OUT = DATA / "fund_nav.json"
+
+
+def update_fund():
+    """Daily NAV of the paper long/short fund, benchmarked to cash.
+    Sizes are kept as fractions of NAV (no euro amounts are published). Each position holds a fixed number of
+    shares from entry: P&L in euros = shares x price change / unit / today's FX (the position is financed in its own
+    currency, so only the P&L carries currency risk). Running costs (financing, borrow, dividends, trading, data)
+    are accrued daily at the rate modelled in the workbook."""
+    import numpy as np
+    if not FUND_IN.exists():
+        return
+    F = json.loads(FUND_IN.read_text())
+    P = [p for p in F["positions"] if p.get("entry")]
+    start = pd.Timestamp(F["start"])
+    fxmap = F.get("fx", {})
+    tickers = sorted({p["yahoo"] for p in P} | set(fxmap.values()))
+    closes = fetch_closes(tickers, (start - pd.Timedelta(days=10)).strftime("%Y-%m-%d"))
+    if closes.empty:
+        print("Fund: no prices from Yahoo; keeping the previous fund_nav.json")
+        return
+    idx = closes.index[closes.index >= start - pd.Timedelta(days=5)]
+    base = start - pd.Timedelta(minutes=1)          # the book starts from the close before the first day
+    days = [base] + [d for d in idx if d >= start]
+    C = closes.reindex(closes.index.union(days)).sort_index().ffill()
+
+    def fx(ccy, t):
+        if ccy == "EUR" or ccy not in fxmap or fxmap[ccy] not in C.columns:
+            return 1.0
+        v = C[fxmap[ccy]].asof(t)
+        return float(v) if pd.notna(v) else 1.0
+
+    R = F.get("rules", {})
+    rows, pnl_by, val_by = [], {}, {}
+    for p in P:
+        y, side = p["yahoo"], (1 if p["side"] == "long" else -1)
+        unit, ccy, e = float(p.get("unit") or 1), p.get("currency", "EUR"), float(p["entry"])
+        ed = pd.Timestamp(p["entryDate"])
+        xd = pd.Timestamp(p["exitDate"]) + EOD if p.get("exitDate") and p.get("exit") is not None else None
+        s = C[y].dropna() if y in C.columns else pd.Series(dtype=float)
+        first = s[s.index >= ed]
+        if len(first) and abs(first.iloc[0] / e - 1) > 0.25:   # Yahoo listed in another unit / currency
+            print(f"Fund: {p['id']} {y} Yahoo price {first.iloc[0]:.4g} far from entry {e}; rescaling")
+            s = s * (e / first.iloc[0])
+        fx0 = fx(ccy, ed - pd.Timedelta(minutes=1))
+        sh = p["weight"] * fx0 * unit / e                 # local shares per 1.0 of starting NAV
+        prev, path, vals = e, [], []
+        for t in days:
+            if t < ed or (xd is not None and t > xd):
+                path.append(0.0); vals.append(0.0); continue
+            px = float(p["exit"]) if xd is not None and t >= xd else (float(s.asof(t)) if len(s) and pd.notna(s.asof(t)) else prev)
+            path.append(side * sh * (px - prev) / unit / fx(ccy, t))
+            vals.append(0.0 if xd is not None and t >= xd else sh * px / unit / fx(ccy, t))
+            prev = px
+        pnl = np.array(path)
+        pnl_by[p["id"]] = pnl
+        val_by[p["id"]] = np.array(vals)
+        last_px = prev
+        live = xd is None
+        value = sh * last_px / unit / fx(ccy, days[-1]) if live else 0.0
+        ret = side * (last_px / e - 1)
+        ml = R.get("maxLossLong", .015) if side == 1 else R.get("maxLossShort", .0125)
+        stop = None if p["type"] == "future" else (p.get("stop") or e * (1 - side * ml / p["weight"]))
+        rows.append({"id": p["id"], "last": round(last_px, 6), "ret": round(ret, 5),
+                     "contrib": round(float(pnl.sum()), 6), "value": round(value, 5), "stop": round(stop, 6) if stop else None,
+                     "toStop": round(side * (last_px / stop - 1), 5) if live and stop else None,
+                     "stopHit": bool(live and stop and side * (last_px - stop) <= 0), "open": live})
+
+    n = len(days)
+    tot = sum(pnl_by.values()) if pnl_by else np.zeros(n)
+    yrs = np.array([(t - base).total_seconds() / (365.25 * 86400) for t in days])
+    cost = -F.get("runningCost", 0.0264) * yrs
+    nav = 1 + np.cumsum(tot) + cost
+    cash = (1 + F.get("cashRate", 0.025)) ** yrs
+    beta_t = sum(((1 if p["side"] == "long" else -1) * p.get("beta", 1) * val_by[p["id"]] for p in P), np.zeros(n)) / nav
+    gross_t = sum((val_by[p["id"]] for p in P), np.zeros(n)) / nav
+    peak = np.maximum.accumulate(nav)
+    dd = nav / peak - 1
+
+    pairs = {}
+    for p in P:
+        pairs.setdefault(p["pair"], 0.0)
+        pairs[p["pair"]] += float(pnl_by[p["id"]].sum())
+    pairs["Costs"] = float(cost[-1])
+
+    # Exposure now (positions marked to market, as a fraction of current NAV)
+    by_id = {r["id"]: r for r in rows}
+    sgn = {p["id"]: (1 if p["side"] == "long" else -1) for p in P}
+    navN = float(nav[-1])
+    gross = sum(by_id[p["id"]]["value"] for p in P) / navN
+    longx = sum(by_id[p["id"]]["value"] for p in P if sgn[p["id"]] == 1) / navN
+    shortx = sum(by_id[p["id"]]["value"] for p in P if sgn[p["id"]] == -1) / navN
+    beta = sum(sgn[p["id"]] * by_id[p["id"]]["value"] * p.get("beta", 1) for p in P) / navN
+    eu = [p for p in P if p.get("region") in ("EU", "UK", "CH") and p["type"] != "future"]
+    eu_beta = sum(sgn[p["id"]] * by_id[p["id"]]["value"] * p.get("beta", 1) for p in eu) / navN
+    hedge_beta = sum(sgn[p["id"]] * by_id[p["id"]]["value"] * p.get("beta", 1) for p in P if p["type"] == "future") / navN
+    for r in rows:
+        r["weightNow"] = round(r["value"] / navN, 5)
+        del r["value"]
+
+    # Did the hedge do its job? Daily P&L of the European stocks vs the future.
+    eu_d = sum((pnl_by[p["id"]] for p in eu), np.zeros(n))
+    h_d = sum((pnl_by[p["id"]] for p in P if p["type"] == "future"), np.zeros(n))
+    hedge_stats = None
+    m = (np.abs(eu_d) + np.abs(h_d)) > 0
+    if m.sum() >= 10:
+        a, b = eu_d[m], h_d[m]
+        hedge_stats = {"days": int(m.sum()), "corr": round(float(np.corrcoef(a, b)[0, 1]), 3),
+                       "volBefore": round(float(a.std() * np.sqrt(252)), 5), "volAfter": round(float((a + b).std() * np.sqrt(252)), 5),
+                       "downDays": int((a < 0).sum()), "offsetOnDownDays": round(float(-b[a < 0].sum() / -a[a < 0].sum()), 3) if (a < 0).any() and a[a < 0].sum() else None}
+
+    status = "OK"
+    if dd[-1] <= R.get("ddClose", -0.075):
+        status = "CLOSE"
+    elif dd[-1] <= R.get("ddHalve", -0.05):
+        status = "HALVE"
+    FUND_OUT.write_text(json.dumps({
+        "updated": datetime.now(timezone.utc).isoformat(timespec="minutes"),
+        # [time, fund return, cash return, net beta, gross leverage]
+        "series": [[t.isoformat(timespec="minutes"), round(float(v - 1), 6), round(float(c - 1), 6), round(float(b), 4), round(float(g), 3)]
+                   for t, v, c, b, g in zip(days, nav, cash, beta_t, gross_t)],
+        "positions": rows,
+        "attribution": {k: round(v, 6) for k, v in pairs.items()},
+        "exposure": {"gross": round(gross, 4), "long": round(longx, 4), "short": round(shortx, 4), "net": round(longx - shortx, 4),
+                     "beta": round(beta, 4), "euBeta": round(eu_beta, 4), "hedgeBeta": round(hedge_beta, 4)},
+        "drawdown": round(float(dd[-1]), 5), "maxDrawdown": round(float(dd.min()), 5), "status": status,
+        "hedge": hedge_stats,
+    }, separators=(",", ":")))
+    print(f"Fund: NAV {nav[-1] - 1:+.2%} vs cash {cash[-1] - 1:+.2%} over {n - 1} days; gross {gross:.2f}x, beta {beta:+.3f}")
+
+
 def main():
     try:
         update_kalshi()
     except Exception as e:   # never let Kalshi break the price update
         print(f"Kalshi update failed: {e}")
+    try:
+        update_fund()
+    except Exception as e:   # never let the fund break the price update
+        print(f"Fund update failed: {e}")
     positions = json.loads(POSITIONS.read_text())
     apply_private_sizes(positions)
     settings = json.loads(SETTINGS.read_text()) if SETTINGS.exists() else {}
