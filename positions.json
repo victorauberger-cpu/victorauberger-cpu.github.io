@@ -40,4 +40,5 @@
   {"ticker": "PURR", "name": "Hyperliquid Strategies", "side": "short", "entryDate": "2026-11-09", "entry": 8.65, "exitDate": "2026-11-09", "exit": 8.91, "leverage": 1, "thesis": ""},
   {"ticker": "9984.T", "name": "SoftBank Group", "side": "long", "entryDate": "2026-11-10", "entry": 3776, "exitDate": "2026-11-10", "exit": 3872, "leverage": 1, "thesis": ""},
   {"ticker": "PYPL", "name": "PayPal", "side": "long", "entryDate": "2026-11-10", "entry": 60.05, "exitDate": "2026-11-10", "exit": 58.76, "leverage": 1, "thesis": ""}
+  {"ticker": "ONON", "name": "On Holding", "side": "short", "entryDate": "2026-11-13", "entry": 36.06, "exitDate": "", "exit": null, "leverage": 1, "thesis": "Currently trading at 36.06 aftermarket which represents a 9% gain for no apparent reason or news, shorting due to sudden jump."}
 ]
