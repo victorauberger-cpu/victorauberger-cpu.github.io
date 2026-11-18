@@ -1,9 +1,9 @@
 [
-  {"ticker": "CIFR", "name": "Cipher Digital", "side": "long", "limit": 6.6, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open"},
-  {"ticker": "IREN", "name": "IREN", "side": "long", "limit": 16.4, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open"},
-  {"ticker": "MRVL", "name": "Marvell Technology", "side": "long", "limit": 150.2, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open"},
-  {"ticker": "ORCL", "name": "Oracle", "side": "long", "limit": 116.8, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open"},
-  {"ticker": "NVDA", "name": "Nvidia", "side": "long", "limit": 161, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open"},
-  {"ticker": "SNDK", "name": "Sandisk", "side": "long", "limit": 818.5, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open"},
-  {"ticker": "MU", "name": "Micron Technology", "side": "long", "limit": 721.4, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open"}
+  {"ticker": "CIFR", "name": "Cipher Digital", "side": "long", "limit": 6.6, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open", "session": "afterhours"},
+  {"ticker": "IREN", "name": "IREN", "side": "long", "limit": 16.4, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open", "session": "afterhours"},
+  {"ticker": "MRVL", "name": "Marvell Technology", "side": "long", "limit": 150.2, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open", "session": "afterhours"},
+  {"ticker": "ORCL", "name": "Oracle", "side": "long", "limit": 116.8, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open", "session": "afterhours"},
+  {"ticker": "NVDA", "name": "Nvidia", "side": "long", "limit": 161, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open", "session": "afterhours"},
+  {"ticker": "SNDK", "name": "Sandisk", "side": "long", "limit": 818.5, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open", "session": "afterhours"},
+  {"ticker": "MU", "name": "Micron Technology", "side": "long", "limit": 721.4, "leverage": 4, "thesis": "", "created": "2026-11-18T01:23:11Z", "status": "open", "session": "afterhours"}
 ]

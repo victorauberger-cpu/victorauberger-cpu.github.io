@@ -7,6 +7,8 @@ filled and the position is added to positions.json:
   - buy (long):  fills when a bar trades at or below the limit
   - sell short:  fills when a bar trades at or above the limit
 
+An order with "session": "afterhours" only fills on after-hours trades (16:00–20:00 New York time).
+
 The fill price is the limit, or the bar's opening price if the market gapped through the limit.
 A fill during after-hours trading is dated the next weekday, so the site starts tracking it from the next
 session instead of comparing it with a regular close that happened before the fill.
@@ -68,6 +70,8 @@ def main():
         except Exception as e:
             print(f"Could not check {o['ticker']}: {e}")
             continue
+        if o.get("session") == "afterhours":          # only after-hours trading: 16:00–20:00 New York time
+            bars = bars[(bars.index.hour >= 16) & (bars.index.hour < 20)]
         if bars.empty:
             continue
         lim, short = float(o["limit"]), o["side"] == "short"
