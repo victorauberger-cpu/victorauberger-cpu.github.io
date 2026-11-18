@@ -7,6 +7,10 @@ filled and the position is added to positions.json:
   - open a long  / close a short (buying):  fills when the price trades at or below the limit
   - open a short / close a long  (selling): fills when the price trades at or above the limit
 
+Stop orders ("type": "stop", with "stop" instead of "limit") work the other way round: a stop that sells
+(closing a long) triggers when the price trades at or below the stop, and fills at the stop, or at the bar's
+opening price if the market gapped below it. A stop that buys (closing a short) triggers at or above the stop.
+
 Order fields: ticker, name, side ("long"/"short"), action ("open", default, or "close"), limit, leverage,
 thesis, created (UTC time the order was placed), optional expires. Orders without "expires" stay open
 until filled or cancelled. Checked in every session: pre-market, regular, after-hours and overnight.
@@ -114,7 +118,11 @@ def main():
         closing = o.get("action", "open") == "close"
         # does this order fill when the price rises to the limit (selling) or falls to it (buying)?
         sells = (o["side"] == "short") != closing
-        what = f"{'close' if closing else 'open'} {o['side']} {o['ticker']} at {o['limit']}"
+        stop = o.get("type") == "stop"
+        lim = float(o["stop"] if stop else o["limit"])
+        # limit orders fill when the price moves in your favour to the level; stops when it moves against you
+        up = sells != stop                      # True: triggers when the price rises to the level
+        what = f"{'close' if closing else 'open'} {o['side']} {o['ticker']} {'stop' if stop else 'limit'} {lim}"
         exp = pd.Timestamp(o["expires"]) if o.get("expires") else None
         if exp is not None and exp.tzinfo is None:
             exp = exp.tz_localize(ET)
@@ -125,11 +133,10 @@ def main():
             bars = pd.DataFrame()
         if exp is not None and len(bars):
             bars = bars[bars.index < exp.tz_convert(ET)]
-        lim = float(o["limit"])
-        hit = (bars[bars["High"] >= lim] if sells else bars[bars["Low"] <= lim]) if len(bars) else bars
+        hit = (bars[bars["High"] >= lim] if up else bars[bars["Low"] <= lim]) if len(bars) else bars
         if len(hit):
             ts, bar = hit.index[0], hit.iloc[0]
-            price = round(max(lim, float(bar["Open"])) if sells else min(lim, float(bar["Open"])), 4)
+            price = round(max(lim, float(bar["Open"])) if up else min(lim, float(bar["Open"])), 4)
             if apply_fill(o, price, ts, positions):
                 print(f"FILLED: {what} -> {price} ({ts:%Y-%m-%d %H:%M} ET)")
             changed = True
@@ -140,7 +147,7 @@ def main():
             except Exception as e:
                 px = None
                 print(f"Could not read overnight price for {o['ticker']}: {e}")
-            if px is not None and ((px >= lim) if sells else (px <= lim)):
+            if px is not None and ((px >= lim) if up else (px <= lim)):
                 ts = now.tz_convert(ET).floor("min")
                 if apply_fill(o, px, ts, positions):
                     print(f"FILLED overnight: {what} -> {px} ({ts:%Y-%m-%d %H:%M} ET)")
