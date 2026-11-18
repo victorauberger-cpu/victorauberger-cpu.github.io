@@ -268,6 +268,40 @@ def update_kalshi(max_pages=120, budget_s=120):
     print(f"Kalshi: {scanned} markets on {pages} pages, {len(top)} live events, wrote {KALSHI_OUT.name}")
 
 
+def latest_prices(tickers):
+    """Most recent trade for each ticker in any session: pre-market, regular, after-hours (Yahoo 1-minute data)
+    or overnight (Blue Ocean ATS price shown on the Yahoo quote page, 20:00–04:00 New York time)."""
+    import yfinance as yf
+    out = {}
+    now_et = pd.Timestamp.now(tz="America/New_York")
+    overnight = now_et.hour >= 20 or now_et.hour < 4
+    for t in tickers:
+        try:
+            df = yf.download(t, period="5d", interval="1m", prepost=True, progress=False, auto_adjust=False)
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+            df = df.dropna(subset=["Close"])
+            if len(df):
+                ts = df.index[-1]
+                ts = (ts if ts.tzinfo else ts.tz_localize("UTC")).tz_convert("America/New_York")
+                mins = ts.hour * 60 + ts.minute
+                session = "pre-market" if mins < 570 else "regular" if mins < 960 else "after-hours"
+                if "." in t:          # non-US listings: no extended hours on Yahoo
+                    session = "regular"
+                out[t] = {"price": round(float(df["Close"].iloc[-1]), 4), "time": ts.isoformat(), "session": session}
+        except Exception as e:
+            print(f"Latest price failed for {t}: {e}")
+        if overnight and "." not in t and not t.startswith("^"):
+            try:
+                from orders import overnight_price
+                px = overnight_price(t)
+                if px is not None:
+                    out[t] = {"price": px, "time": now_et.floor("min").isoformat(), "session": "overnight"}
+            except Exception as e:
+                print(f"Overnight price failed for {t}: {e}")
+    return out
+
+
 def main():
     try:
         update_kalshi()
@@ -284,11 +318,16 @@ def main():
     if closes.empty:
         sys.exit("Yahoo Finance returned no data; keeping the previous prices.json")
     last, series = compute(positions, closes, settings)
+    open_tickers = sorted({p["ticker"] for p in positions if not p.get("exitDate")})
+    live = latest_prices(open_tickers)
+    for t, v in live.items():
+        last[t] = v["price"]           # open positions are marked at the latest trade, in whatever session
     OUT.write_text(json.dumps({
         "updated": datetime.now(timezone.utc).isoformat(timespec="minutes"),
         "sample": False,
         "benchmarkName": settings.get("benchmarkName"),
         "last": last,
+        "lastInfo": live,
         "series": series,
     }, indent=1))
     print(f"Wrote {OUT} with {len(series)} points, {len(last)} tickers")

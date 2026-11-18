@@ -419,7 +419,7 @@ async function load(){
   const upd = PRICES.updated ? new Date(PRICES.updated) : null;
   const when = upd ? upd.toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "–";
   const sample = PRICES.sample ? '<span class="sample">sample data</span>' : "";
-  $("#asof").innerHTML = `Open positions marked at the latest Yahoo Finance price (updated ${when}, delayed ~15 min). Short returns = (entry − exit) / entry; leveraged returns are multiplied by the leverage. Prices in US dollars unless marked.${sample}`;
+  $("#asof").innerHTML = `Open positions marked at the latest trade in any session (pre-market, regular, after-hours or overnight), from Yahoo Finance (updated ${when}). Short returns = (entry − exit) / entry; leveraged returns are multiplied by the leverage. Prices in US dollars unless marked.${sample}`;
   $("#perfNote").innerHTML = `Positions weighted by their size (amounts never shown). When no position is open, the money is assumed to sit in the S&amp;P 500. Updated ${when}.${sample}`;
 }
 
@@ -624,7 +624,7 @@ function renderTable(){
     <td>${fmtDs(r.entryDate)}</td>
     <td class="num">${cur(r)}${fmtP(r.entry)}</td>
     <td>${r.isOpen ? '<span class="open">open</span>' : fmtDs(r.exitDate)}</td>
-    <td class="num">${r.px == null ? "–" : cur(r) + fmtP(r.px)}${r.isOpen?'<span class="co">last</span>':''}</td>
+    <td class="num">${r.px == null ? "–" : cur(r) + fmtP(r.px)}${r.isOpen?'<span class="co">'+esc(({"pre-market":"pre-market","after-hours":"after-hours","overnight":"overnight"})[PRICES.lastInfo?.[r.ticker]?.session] || "last")+'</span>':''}</td>
     <td class="num">${r.held}</td>
     <td class="num ${cls(r.ret)}">${pct(r.ret)}</td>
   </tr>${r.note ? `<tr class="note-row" data-for="${i}" hidden><td colspan="10">${String(r.note).split(/\n\s*\n/).map(x => `<p>${esc(x)}</p>`).join("")}</td></tr>` : ""}`).join("");
