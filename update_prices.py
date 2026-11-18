@@ -141,15 +141,11 @@ def compute(positions, closes, settings=None, live=None):
         G = pd.concat([g for _, g in legs], axis=1).reindex(idx)
         den = V.sum(axis=1, min_count=1)
         held = den > 0
-        global DEBUG
-        DEBUG = {}
-        for ts in idx[-4:]:
-            row = {}
-            for c in V.columns:
-                v, g = V.at[ts, c], G.at[ts, c]
-                if pd.notna(v) or pd.notna(g):
-                    row[c] = [None if pd.isna(v) else round(float(v), 4), None if pd.isna(g) else round(float(g), 5)]
-            DEBUG[ts.strftime("%Y-%m-%dT%H:%M")] = row
+        print("DEBUG index duplicated:", int(V.index.duplicated().sum()))
+        for i in range(len(V) - 4, len(V)):
+            vr, gr = V.iloc[i], G.iloc[i]
+            print("DEBUG", V.index[i], "den", round(float(vr.sum()), 4), "gain", round(float(gr.sum()), 5),
+                  {c: (round(float(vr[c]), 3), round(float(gr[c]), 4)) for c in V.columns if pd.notna(vr[c]) or pd.notna(gr[c])})
         r_port = (G.sum(axis=1, min_count=1) / den).where(held)
     else:
         held = pd.Series(False, index=idx)
@@ -357,7 +353,6 @@ def main():
 
         "series": series,
     }, indent=1))
-    (DATA / "debug.json").write_text(json.dumps({"live": {k: v["price"] for k, v in live.items()}, "contrib": globals().get("DEBUG")}))
     print(f"Wrote {OUT} with {len(series)} points, {len(last)} tickers")
 
 
