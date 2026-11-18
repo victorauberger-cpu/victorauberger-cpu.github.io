@@ -354,9 +354,10 @@ def main():
         "benchmarkName": settings.get("benchmarkName"),
         "last": last,
         "lastInfo": live,
-        "debug": globals().get("DEBUG"),
+
         "series": series,
     }, indent=1))
+    (DATA / "debug.json").write_text(json.dumps({"live": {k: v["price"] for k, v in live.items()}, "contrib": globals().get("DEBUG")}))
     print(f"Wrote {OUT} with {len(series)} points, {len(last)} tickers")
 
 
