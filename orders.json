@@ -14,5 +14,6 @@
   {"ticker": "MU", "name": "Micron Technology", "side": "long", "action": "close", "type": "stop", "stop": 729, "created": "2026-11-18T09:30:00Z", "status": "cancelled"},
   {"ticker": "NVDA", "name": "Nvidia", "side": "long", "action": "close", "limit": 163, "created": "2026-11-18T09:52:00Z", "status": "cancelled"},
   {"ticker": "TTWO", "name": "Take-Two Interactive", "side": "long", "limit": 215.5, "leverage": 5, "thesis": "", "created": "2026-11-18T12:20:00Z", "status": "open"},
-  {"ticker": "MSFT", "name": "Microsoft", "side": "long", "limit": 507, "leverage": 2, "thesis": "", "created": "2026-11-18T12:30:00Z", "status": "filled", "expires": "2026-11-18T20:00:00-05:00", "fillPrice": 506.35, "fillTime": "2026-11-18T07:30:10-05:00"}
+  {"ticker": "MSFT", "name": "Microsoft", "side": "long", "limit": 507, "leverage": 2, "thesis": "", "created": "2026-11-18T12:30:00Z", "status": "cancelled", "expires": "2026-11-18T20:00:00-05:00", "fillPrice": 506.35, "fillTime": "2026-11-18T07:30:10-05:00"},
+  {"ticker": "MSFT", "name": "Microsoft", "side": "long", "type": "stop", "stop": 507, "leverage": 2, "thesis": "", "created": "2026-11-18T12:45:00Z", "status": "open", "expires": "2026-11-18T20:00:00-05:00"}
 ]
