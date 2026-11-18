@@ -133,10 +133,11 @@ def main():
             bars = pd.DataFrame()
         if exp is not None and len(bars):
             bars = bars[bars.index < exp.tz_convert(ET)]
-        hit = (bars[bars["High"] >= lim] if up else bars[bars["Low"] <= lim]) if len(bars) else bars
+        # Trigger on 5-minute closing prices: Yahoo's bar highs and lows include stray prints that brokers don't show.
+        hit = (bars[bars["Close"] >= lim] if up else bars[bars["Close"] <= lim]) if len(bars) else bars
         if len(hit):
             ts, bar = hit.index[0], hit.iloc[0]
-            price = round(max(lim, float(bar["Open"])) if up else min(lim, float(bar["Open"])), 4)
+            price = round(max(lim, float(bar["Open"])) if up else min(lim, float(bar["Open"])), 4)  # gap through: open
             if apply_fill(o, price, ts, positions):
                 print(f"FILLED: {what} -> {price} ({ts:%Y-%m-%d %H:%M} ET)")
             changed = True
