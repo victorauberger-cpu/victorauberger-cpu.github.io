@@ -112,12 +112,23 @@ def compute(positions, closes, settings=None):
         value = (1 + lev * raw).clip(lower=1e-6)       # 1 unit put into the trade
         w = float(p.get("weight") or 1)
         key = t + "_" + p["entryDate"]
-        legs.append(((w * value.shift(1)).dropna().rename(key), (w * value.diff()).dropna().rename(key)))
+        legs.append((key, w, value, exit_ is None))
 
     idx = closes.index[closes.index >= start].union(pd.DatetimeIndex([start]))
-    for v, g in legs:
-        idx = idx.union(v.index)
+    for _, _, value, _ in legs:
+        idx = idx.union(value.index)
     idx = idx[idx >= start]
+
+    # Each position keeps its last price on days its own market has no new price (another exchange traded,
+    # or the day is still in progress), so it counts in the day's weights with a 0% move instead of the day's
+    # return being computed from whichever single position happened to have a price.
+    filled = []
+    for key, w, value, still_open in legs:
+        end = idx.max() if still_open else value.index.max()      # open positions run to the latest date
+        span = idx[(idx >= value.index.min()) & (idx <= end)]
+        v = value.reindex(value.index.union(span)).ffill()
+        filled.append(((w * v.shift(1)).dropna().rename(key), (w * v.diff()).dropna().rename(key)))
+    legs = filled
 
     if legs:
         V = pd.concat([v for v, _ in legs], axis=1).reindex(idx)
