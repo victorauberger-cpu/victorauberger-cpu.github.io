@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
   schedule:
-    # every 15 min from pre-market to the end of after-hours trading (07:00–00:59 UTC, Mon–Fri)
-    - cron: "4,19,34,49 7-23 * * 1-5"
-    - cron: "4,19,34,49 0 * * 2-6"
+    # every 15 min around the clock on weekdays: pre-market, regular, after-hours and overnight sessions
+    - cron: "4,19,34,49 * * * 1-5"
+    - cron: "4,19,34,49 0 * * 6"
   workflow_dispatch:
 
 permissions:

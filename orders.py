@@ -13,8 +13,13 @@ The fill price is the limit, or the bar's opening price if the market gapped thr
 A fill during after-hours trading is dated the next weekday, so the site starts tracking it from the next
 session instead of comparing it with a regular close that happened before the fill.
 
+Overnight session (Blue Ocean ATS, 20:00–04:00 New York time): Yahoo's chart data does not include it, so the
+live overnight price shown on the Yahoo quote page is read at each run instead. Overnight fills are therefore
+checked every 15 minutes on that snapshot price, not on every trade.
+
 This only records trades on the website. It does not send any order to a broker.
 """
+import re
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -37,6 +42,25 @@ def bars_since(ticker, since_utc):
     idx = df.index if df.index.tz is not None else df.index.tz_localize("UTC")
     df.index = idx.tz_convert(ET)
     return df[df.index >= since_utc.tz_convert(ET)]
+
+
+def overnight_price(ticker):
+    """Latest overnight-session price from the Yahoo quote page, or None outside the overnight session."""
+    url = f"https://finance.yahoo.com/quote/{ticker}/"
+    try:
+        from curl_cffi import requests as creq                      # installed with yfinance; looks like a browser
+        html = creq.get(url, impersonate="chrome", timeout=30).text
+    except Exception:
+        import urllib.request
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126.0 Safari/537.36"})
+        html = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "replace")
+    m = re.search(r'data-testid="qsp-overnight-price"[^>]*>([\d,\.]+)<', html)
+    return float(m.group(1).replace(",", "")) if m else None
+
+
+def in_overnight(now_utc):
+    t = now_utc.tz_convert(ET)
+    return t.hour >= 20 or t.hour < 4
 
 
 def fill_date(ts_et):
@@ -74,6 +98,25 @@ def main():
             bars = bars[(bars.index.hour >= 16) & (bars.index.hour < 20)]
         lim, short = float(o["limit"]), o["side"] == "short"
         hit = bars[bars["High"] >= lim] if short else bars[bars["Low"] <= lim] if len(bars) else bars
+        if hit.empty and in_overnight(now) and (exp is None or now < exp) and o.get("session") != "afterhours":
+            try:
+                px = overnight_price(o["ticker"])
+            except Exception as e:
+                px = None
+                print(f"Could not read overnight price for {o['ticker']}: {e}")
+            if px is not None and ((px >= lim) if short else (px <= lim)):
+                ts = now.tz_convert(ET).floor("min")
+                o.update(status="filled", fillPrice=px, fillTime=ts.isoformat(), fillSession="overnight")
+                positions.append({
+                    "ticker": o["ticker"], "name": o.get("name", o["ticker"]), "side": o["side"],
+                    "entryDate": fill_date(ts), "entry": px, "exitDate": "", "exit": None,
+                    "leverage": o.get("leverage", 1), "thesis": o.get("thesis", ""),
+                })
+                changed = True
+                print(f"FILLED overnight: {o['side']} {o['ticker']} at {px} ({ts:%Y-%m-%d %H:%M} ET)")
+                continue
+            if px is not None:
+                print(f"Waiting (overnight {px}): {o['side']} {o['ticker']} at {lim}")
         if hit.empty:
             if exp is not None and now >= exp:
                 o["status"] = "expired"
