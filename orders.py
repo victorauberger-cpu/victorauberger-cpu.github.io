@@ -57,6 +57,8 @@ def overnight_price(ticker):
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126.0 Safari/537.36"})
         html = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "replace")
     m = re.search(r'data-testid="qsp-overnight-price"[^>]*>([\d,\.]+)<', html)
+    if not m:
+        print(f"Overnight price not found for {ticker} (page {len(html)} chars, 'overnight' in page: {'overnight' in html.lower()})")
     return float(m.group(1).replace(",", "")) if m else None
 
 
