@@ -13,5 +13,6 @@
   {"ticker": "SNDK", "name": "Sandisk", "side": "long", "action": "close", "type": "stop", "stop": 822, "created": "2026-11-18T09:30:00Z", "status": "cancelled"},
   {"ticker": "MU", "name": "Micron Technology", "side": "long", "action": "close", "type": "stop", "stop": 729, "created": "2026-11-18T09:30:00Z", "status": "cancelled"},
   {"ticker": "NVDA", "name": "Nvidia", "side": "long", "action": "close", "limit": 163, "created": "2026-11-18T09:52:00Z", "status": "cancelled"},
-  {"ticker": "TTWO", "name": "Take-Two Interactive", "side": "long", "limit": 215.5, "leverage": 5, "thesis": "", "created": "2026-11-18T12:20:00Z", "status": "open"}
+  {"ticker": "TTWO", "name": "Take-Two Interactive", "side": "long", "limit": 215.5, "leverage": 5, "thesis": "", "created": "2026-11-18T12:20:00Z", "status": "open"},
+  {"ticker": "MSFT", "name": "Microsoft", "side": "long", "limit": 507, "leverage": 2, "thesis": "", "created": "2026-11-18T12:30:00Z", "status": "open", "expires": "2026-11-18T20:00:00-05:00"}
 ]
