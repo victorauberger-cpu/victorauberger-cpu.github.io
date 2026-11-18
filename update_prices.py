@@ -141,11 +141,6 @@ def compute(positions, closes, settings=None, live=None):
         G = pd.concat([g for _, g in legs], axis=1).reindex(idx)
         den = V.sum(axis=1, min_count=1)
         held = den > 0
-        print("DEBUG index duplicated:", int(V.index.duplicated().sum()))
-        for i in range(len(V) - 4, len(V)):
-            vr, gr = V.iloc[i], G.iloc[i]
-            print("DEBUG", V.index[i], "den", round(float(vr.sum()), 4), "gain", round(float(gr.sum()), 5),
-                  [(V.columns[j], round(float(vr.iloc[j]), 3), round(float(gr.iloc[j]), 4)) for j in range(len(V.columns)) if pd.notna(vr.iloc[j]) or pd.notna(gr.iloc[j])])
         r_port = (G.sum(axis=1, min_count=1) / den).where(held)
     else:
         held = pd.Series(False, index=idx)
@@ -339,6 +334,16 @@ def main():
     closes = fetch_closes(tickers, fetch_from)
     if closes.empty:
         sys.exit("Yahoo Finance returned no data; keeping the previous prices.json")
+    # Before the US open, Yahoo already returns a daily row for "today" filled with stale prices. Drop it for US
+    # listings (and anything dated in the future); the latest pre-market/overnight price is added below instead.
+    now_et = pd.Timestamp.now(tz="America/New_York")
+    today = now_et.tz_localize(None).normalize()
+    us = [c for c in closes.columns if "." not in c]
+    future = closes.index >= today + pd.Timedelta(days=1)
+    closes.loc[future, us] = float("nan")
+    if now_et.hour * 60 + now_et.minute < 570:          # before 9:30 New York
+        closes.loc[(closes.index >= today) & ~future, us] = float("nan")
+    closes = closes.dropna(how="all")
     open_tickers = sorted({p["ticker"] for p in positions if not p.get("exitDate")})
     live = latest_prices(open_tickers)
     last, series = compute(positions, closes, settings, live)
