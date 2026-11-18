@@ -145,7 +145,7 @@ def compute(positions, closes, settings=None, live=None):
         for i in range(len(V) - 4, len(V)):
             vr, gr = V.iloc[i], G.iloc[i]
             print("DEBUG", V.index[i], "den", round(float(vr.sum()), 4), "gain", round(float(gr.sum()), 5),
-                  {c: (round(float(vr[c]), 3), round(float(gr[c]), 4)) for c in V.columns if pd.notna(vr[c]) or pd.notna(gr[c])})
+                  [(V.columns[j], round(float(vr.iloc[j]), 3), round(float(gr.iloc[j]), 4)) for j in range(len(V.columns)) if pd.notna(vr.iloc[j]) or pd.notna(gr.iloc[j])])
         r_port = (G.sum(axis=1, min_count=1) / den).where(held)
     else:
         held = pd.Series(False, index=idx)
