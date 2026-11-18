@@ -141,6 +141,15 @@ def compute(positions, closes, settings=None, live=None):
         G = pd.concat([g for _, g in legs], axis=1).reindex(idx)
         den = V.sum(axis=1, min_count=1)
         held = den > 0
+        global DEBUG
+        DEBUG = {}
+        for ts in idx[-4:]:
+            row = {}
+            for c in V.columns:
+                v, g = V.at[ts, c], G.at[ts, c]
+                if pd.notna(v) or pd.notna(g):
+                    row[c] = [None if pd.isna(v) else round(float(v), 4), None if pd.isna(g) else round(float(g), 5)]
+            DEBUG[ts.strftime("%Y-%m-%dT%H:%M")] = row
         r_port = (G.sum(axis=1, min_count=1) / den).where(held)
     else:
         held = pd.Series(False, index=idx)
@@ -345,6 +354,7 @@ def main():
         "benchmarkName": settings.get("benchmarkName"),
         "last": last,
         "lastInfo": live,
+        "debug": globals().get("DEBUG"),
         "series": series,
     }, indent=1))
     print(f"Wrote {OUT} with {len(series)} points, {len(last)} tickers")
