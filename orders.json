@@ -11,5 +11,6 @@
   {"ticker": "MRVL", "name": "Marvell Technology", "side": "long", "action": "close", "type": "stop", "stop": 153, "created": "2026-11-18T09:30:00Z", "status": "open"},
   {"ticker": "ORCL", "name": "Oracle", "side": "long", "action": "close", "type": "stop", "stop": 117.2, "created": "2026-11-18T09:30:00Z", "status": "open"},
   {"ticker": "SNDK", "name": "Sandisk", "side": "long", "action": "close", "type": "stop", "stop": 822, "created": "2026-11-18T09:30:00Z", "status": "open"},
-  {"ticker": "MU", "name": "Micron Technology", "side": "long", "action": "close", "type": "stop", "stop": 729, "created": "2026-11-18T09:30:00Z", "status": "open"}
+  {"ticker": "MU", "name": "Micron Technology", "side": "long", "action": "close", "type": "stop", "stop": 729, "created": "2026-11-18T09:30:00Z", "status": "open"},
+  {"ticker": "NVDA", "name": "Nvidia", "side": "long", "action": "close", "limit": 163, "created": "2026-11-18T09:52:00Z", "status": "open"}
 ]
