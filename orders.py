@@ -4,10 +4,12 @@ Reads orders.json. For every open order it downloads Yahoo Finance 5-minute bars
 after-hours trading* since the order was placed. When the price touches the limit, the order is marked as
 filled and the position is added to positions.json:
 
-  - buy (long):  fills when a bar trades at or below the limit
-  - sell short:  fills when a bar trades at or above the limit
+  - open a long  / close a short (buying):  fills when the price trades at or below the limit
+  - open a short / close a long  (selling): fills when the price trades at or above the limit
 
-An order with "session": "afterhours" only fills on after-hours trades (16:00–20:00 New York time).
+Order fields: ticker, name, side ("long"/"short"), action ("open", default, or "close"), limit, leverage,
+thesis, created (UTC time the order was placed), optional expires. Orders without "expires" stay open
+until filled or cancelled. Checked in every session: pre-market, regular, after-hours and overnight.
 
 The fill price is the limit, or the bar's opening price if the market gapped through the limit.
 A fill during after-hours trading is dated the next weekday, so the site starts tracking it from the next
@@ -73,6 +75,27 @@ def fill_date(ts_et):
     return d.strftime("%Y-%m-%d")
 
 
+def apply_fill(o, price, ts, positions):
+    """Record a filled order. Opening orders add a position; closing orders fill in the exit of the open one."""
+    if o.get("action", "open") == "close":
+        match = [p for p in positions if p["ticker"] == o["ticker"] and p["side"] == o["side"] and not p.get("exitDate")]
+        if not match:
+            o["status"] = "rejected"
+            print(f"No open {o['side']} {o['ticker']} position to close")
+            return False
+        pos = match[-1]
+        pos["exitDate"] = ts.strftime("%Y-%m-%d")       # exits keep the New York date of the fill
+        pos["exit"] = price
+    else:
+        positions.append({
+            "ticker": o["ticker"], "name": o.get("name", o["ticker"]), "side": o["side"],
+            "entryDate": fill_date(ts), "entry": price, "exitDate": "", "exit": None,
+            "leverage": o.get("leverage", 1), "thesis": o.get("thesis", ""),
+        })
+    o.update(status="filled", fillPrice=price, fillTime=ts.isoformat())
+    return True
+
+
 def main():
     if not ORDERS.exists():
         return
@@ -84,58 +107,49 @@ def main():
     now = pd.Timestamp.now(tz="UTC")
     changed = False
     for o in open_orders:
-        exp = pd.Timestamp(o["expires"]) if o.get("expires") else None   # e.g. "2026-11-18T15:00:00-05:00"
+        closing = o.get("action", "open") == "close"
+        # does this order fill when the price rises to the limit (selling) or falls to it (buying)?
+        sells = (o["side"] == "short") != closing
+        what = f"{'close' if closing else 'open'} {o['side']} {o['ticker']} at {o['limit']}"
+        exp = pd.Timestamp(o["expires"]) if o.get("expires") else None
         if exp is not None and exp.tzinfo is None:
             exp = exp.tz_localize(ET)
         try:
             bars = bars_since(o["ticker"], pd.Timestamp(o["created"]))
         except Exception as e:
             print(f"Could not check {o['ticker']}: {e}")
-            continue
+            bars = pd.DataFrame()
         if exp is not None and len(bars):
-            bars = bars[bars.index < exp.tz_convert(ET)]          # ignore anything traded after expiry
-        if o.get("session") == "afterhours":          # only after-hours trading: 16:00–20:00 New York time
-            bars = bars[(bars.index.hour >= 16) & (bars.index.hour < 20)]
-        lim, short = float(o["limit"]), o["side"] == "short"
-        hit = bars[bars["High"] >= lim] if short else bars[bars["Low"] <= lim] if len(bars) else bars
-        if hit.empty and in_overnight(now) and (exp is None or now < exp) and o.get("session") != "afterhours":
+            bars = bars[bars.index < exp.tz_convert(ET)]
+        lim = float(o["limit"])
+        hit = (bars[bars["High"] >= lim] if sells else bars[bars["Low"] <= lim]) if len(bars) else bars
+        if len(hit):
+            ts, bar = hit.index[0], hit.iloc[0]
+            price = round(max(lim, float(bar["Open"])) if sells else min(lim, float(bar["Open"])), 4)
+            if apply_fill(o, price, ts, positions):
+                print(f"FILLED: {what} -> {price} ({ts:%Y-%m-%d %H:%M} ET)")
+            changed = True
+            continue
+        if in_overnight(now) and (exp is None or now < exp):
             try:
                 px = overnight_price(o["ticker"])
             except Exception as e:
                 px = None
                 print(f"Could not read overnight price for {o['ticker']}: {e}")
-            if px is not None and ((px >= lim) if short else (px <= lim)):
+            if px is not None and ((px >= lim) if sells else (px <= lim)):
                 ts = now.tz_convert(ET).floor("min")
-                o.update(status="filled", fillPrice=px, fillTime=ts.isoformat(), fillSession="overnight")
-                positions.append({
-                    "ticker": o["ticker"], "name": o.get("name", o["ticker"]), "side": o["side"],
-                    "entryDate": fill_date(ts), "entry": px, "exitDate": "", "exit": None,
-                    "leverage": o.get("leverage", 1), "thesis": o.get("thesis", ""),
-                })
+                if apply_fill(o, px, ts, positions):
+                    print(f"FILLED overnight: {what} -> {px} ({ts:%Y-%m-%d %H:%M} ET)")
                 changed = True
-                print(f"FILLED overnight: {o['side']} {o['ticker']} at {px} ({ts:%Y-%m-%d %H:%M} ET)")
                 continue
             if px is not None:
-                print(f"Waiting (overnight {px}): {o['side']} {o['ticker']} at {lim}")
-        if hit.empty:
-            if exp is not None and now >= exp:
-                o["status"] = "expired"
-                changed = True
-                print(f"Expired unfilled: {o['side']} {o['ticker']} at {lim}")
-            elif len(bars):
-                print(f"Waiting: {o['side']} {o['ticker']} at {lim} (last {float(bars['Close'].iloc[-1]):.2f})")
-            continue
-        ts, bar = hit.index[0], hit.iloc[0]
-        price = max(lim, float(bar["Open"])) if short else min(lim, float(bar["Open"]))
-        price = round(price, 4)
-        o.update(status="filled", fillPrice=price, fillTime=ts.isoformat())
-        positions.append({
-            "ticker": o["ticker"], "name": o.get("name", o["ticker"]), "side": o["side"],
-            "entryDate": fill_date(ts), "entry": price, "exitDate": "", "exit": None,
-            "leverage": o.get("leverage", 1), "thesis": o.get("thesis", ""),
-        })
-        changed = True
-        print(f"FILLED: {o['side']} {o['ticker']} at {price} ({ts:%Y-%m-%d %H:%M} ET)")
+                print(f"Waiting (overnight price {px}): {what}")
+        if exp is not None and now >= exp:
+            o["status"] = "expired"
+            changed = True
+            print(f"Expired unfilled: {what}")
+        elif len(bars):
+            print(f"Waiting (last {float(bars['Close'].iloc[-1]):.2f}): {what}")
     if changed:
         ORDERS.write_text("[\n" + ",\n".join("  " + json.dumps(x, ensure_ascii=False) for x in orders) + "\n]\n")
         POSITIONS.write_text("[\n" + ",\n".join("  " + json.dumps(x, ensure_ascii=False) for x in positions) + "\n]\n")
