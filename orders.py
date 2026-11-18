@@ -60,24 +60,27 @@ def main():
     now = pd.Timestamp.now(tz="UTC")
     changed = False
     for o in open_orders:
-        if o.get("expires") and now > pd.Timestamp(o["expires"]).tz_localize(ET) + pd.Timedelta(hours=20):
-            o["status"] = "expired"
-            changed = True
-            print(f"Order expired: {o['side']} {o['ticker']} at {o['limit']}")
-            continue
+        exp = pd.Timestamp(o["expires"]) if o.get("expires") else None   # e.g. "2026-11-18T15:00:00-05:00"
+        if exp is not None and exp.tzinfo is None:
+            exp = exp.tz_localize(ET)
         try:
             bars = bars_since(o["ticker"], pd.Timestamp(o["created"]))
         except Exception as e:
             print(f"Could not check {o['ticker']}: {e}")
             continue
+        if exp is not None and len(bars):
+            bars = bars[bars.index < exp.tz_convert(ET)]          # ignore anything traded after expiry
         if o.get("session") == "afterhours":          # only after-hours trading: 16:00–20:00 New York time
             bars = bars[(bars.index.hour >= 16) & (bars.index.hour < 20)]
-        if bars.empty:
-            continue
         lim, short = float(o["limit"]), o["side"] == "short"
-        hit = bars[bars["High"] >= lim] if short else bars[bars["Low"] <= lim]
+        hit = bars[bars["High"] >= lim] if short else bars[bars["Low"] <= lim] if len(bars) else bars
         if hit.empty:
-            print(f"Waiting: {o['side']} {o['ticker']} at {lim} (last {float(bars['Close'].iloc[-1]):.2f})")
+            if exp is not None and now >= exp:
+                o["status"] = "expired"
+                changed = True
+                print(f"Expired unfilled: {o['side']} {o['ticker']} at {lim}")
+            elif len(bars):
+                print(f"Waiting: {o['side']} {o['ticker']} at {lim} (last {float(bars['Close'].iloc[-1]):.2f})")
             continue
         ts, bar = hit.index[0], hit.iloc[0]
         price = max(lim, float(bar["Open"])) if short else min(lim, float(bar["Open"]))
