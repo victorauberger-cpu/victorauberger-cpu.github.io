@@ -73,7 +73,7 @@ def fetch_closes(tickers, start):
     return closes.sort_index().ffill()
 
 
-def compute(positions, closes, settings=None):
+def compute(positions, closes, settings=None, live=None):
     """Time-weighted performance, as funds report it.
     Each day: the gain of the open positions, weighted by their size, divided by what they were worth that
     morning. On days with no open position the money is assumed to sit in the benchmark (S&P 500).
@@ -105,6 +105,12 @@ def compute(positions, closes, settings=None):
             parts.append(pd.Series({exit_: float(p["exit"])}))
         path = pd.concat(parts).sort_index()
         path = path[~path.index.duplicated(keep="last")]
+        # open positions also get a point "now" at their latest trade (pre-market, after-hours or overnight),
+        # so the total includes moves since the last close and positions opened since then
+        if exit_ is None and live and t in live and len(path):
+            now = pd.Timestamp.now(tz="UTC").tz_localize(None).floor("min")
+            if now > path.index.max():
+                path.loc[now] = float(live[t]["price"])
 
         e = float(p["entry"])
         lev = float(p.get("leverage") or 1)
@@ -328,9 +334,9 @@ def main():
     closes = fetch_closes(tickers, fetch_from)
     if closes.empty:
         sys.exit("Yahoo Finance returned no data; keeping the previous prices.json")
-    last, series = compute(positions, closes, settings)
     open_tickers = sorted({p["ticker"] for p in positions if not p.get("exitDate")})
     live = latest_prices(open_tickers)
+    last, series = compute(positions, closes, settings, live)
     for t, v in live.items():
         last[t] = v["price"]           # open positions are marked at the latest trade, in whatever session
     OUT.write_text(json.dumps({
