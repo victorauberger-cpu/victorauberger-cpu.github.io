@@ -360,6 +360,13 @@ def main():
     closes = closes.dropna(how="all")
     open_tickers = sorted({p["ticker"] for p in positions if not p.get("exitDate")})
     live = latest_prices(open_tickers)
+    try:
+        for c in ["9984.T", "NU", "MDA", "^GSPC"]:
+            if c in closes.columns:
+                print("DIAG closes", c, [(str(i), round(float(v), 3)) for i, v in closes[c].dropna().iloc[-4:].items()])
+        print("DIAG live", live)
+    except Exception as e:
+        print("DIAG failed", e)
     last, series = compute(positions, closes, settings, live)
     for t, v in live.items():
         last[t] = v["price"]           # open positions are marked at the latest trade, in whatever session
