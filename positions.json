@@ -63,5 +63,6 @@
   {"ticker": "TTWO", "name": "Take-Two Interactive", "side": "long", "entryDate": "2026-11-18", "entry": 215.5, "exitDate": "2026-11-18", "exit": 220.0, "leverage": 5, "thesis": "Limit buy set to fill at 215.5, on the view that GTA VI hype would cool overnight after a 10% two-day pullback driven by the wider AI/tech selloff, then spike at the open as the launch approached. Catalysts: near-perfect early reviews (99 on Metacritic), pre-orders ahead of plan, record livestream audiences, and reiterated Buy ratings (Bank of America, Oppenheimer, Jefferies) ahead of the 19 November release."},
   {"ticker": "P", "name": "Everpure", "side": "short", "entryDate": "2026-11-19", "entry": 112.73, "exitDate": "", "exit": null, "leverage": 5, "thesis": "The whole market turned lower after strong gains at the open; Everpure, among the day's biggest gainers, is expected to give back its move."},
   {"ticker": "ANT", "name": "Anthropic", "side": "long", "entryDate": "2026-11-19", "entry": 114.85, "exitDate": "", "exit": null, "leverage": 5, "thesis": ""},
-  {"ticker": "ANT", "name": "Anthropic", "side": "long", "entryDate": "2026-11-19", "entry": 111.31, "exitDate": "", "exit": null, "leverage": 5, "thesis": ""}
+  {"ticker": "ANT", "name": "Anthropic", "side": "long", "entryDate": "2026-11-19", "entry": 111.31, "exitDate": "", "exit": null, "leverage": 5, "thesis": ""},
+  {"ticker": "ANT", "name": "Anthropic", "side": "short", "entryDate": "2026-11-19", "entry": 108.11, "exitDate": "", "exit": null, "leverage": 5, "thesis": ""}
 ]
