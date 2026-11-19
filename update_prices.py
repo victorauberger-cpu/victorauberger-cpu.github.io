@@ -129,12 +129,22 @@ def compute(positions, closes, settings=None, live=None):
     # or the day is still in progress), so it counts in the day's weights with a 0% move instead of the day's
     # return being computed from whichever single position happened to have a price.
     filled = []
+    _units = list(legs)
     for key, w, value, still_open in legs:
         end = idx.max() if still_open else value.index.max()      # open positions run to the latest date
         span = idx[(idx >= value.index.min()) & (idx <= end)]
         v = value.reindex(value.index.union(span)).ffill()
         filled.append(((w * v.shift(1)).dropna().rename(key), (w * v.diff()).dropna().rename(key)))
     legs = filled
+    try:                                                        # TEMP diagnostic (unit values only, no sizes)
+        tail = idx[-5:]
+        for (key, w, value, still_open) in _units:
+            v = value.reindex(value.index.union(tail)).ffill().reindex(tail)
+            if v.notna().any():
+                print("DIAG", key, [None if pd.isna(x) else round(float(x), 4) for x in v])
+        print("DIAG idx", [str(x) for x in tail])
+    except Exception as e:
+        print("DIAG failed", e)
 
     if legs:
         V = pd.concat([v for v, _ in legs], axis=1).reindex(idx)
@@ -142,6 +152,10 @@ def compute(positions, closes, settings=None, live=None):
         den = V.sum(axis=1, min_count=1)
         held = den > 0
         r_port = (G.sum(axis=1, min_count=1) / den).where(held)
+        try:
+            print("DIAG r_port", [round(float(x), 5) if pd.notna(x) else None for x in r_port.iloc[-5:]])
+        except Exception as e:
+            print("DIAG failed", e)
     else:
         held = pd.Series(False, index=idx)
         r_port = pd.Series(float("nan"), index=idx)
