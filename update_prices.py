@@ -129,22 +129,12 @@ def compute(positions, closes, settings=None, live=None):
     # or the day is still in progress), so it counts in the day's weights with a 0% move instead of the day's
     # return being computed from whichever single position happened to have a price.
     filled = []
-    _units = list(legs)
     for key, w, value, still_open in legs:
         end = idx.max() if still_open else value.index.max()      # open positions run to the latest date
         span = idx[(idx >= value.index.min()) & (idx <= end)]
         v = value.reindex(value.index.union(span)).ffill()
         filled.append(((w * v.shift(1)).dropna().rename(key), (w * v.diff()).dropna().rename(key)))
     legs = filled
-    try:                                                        # TEMP diagnostic (unit values only, no sizes)
-        tail = idx[-5:]
-        for (key, w, value, still_open) in _units:
-            v = value.reindex(value.index.union(tail)).ffill().reindex(tail)
-            if v.notna().any():
-                print("DIAG", key, [None if pd.isna(x) else round(float(x), 4) for x in v])
-        print("DIAG idx", [str(x) for x in tail])
-    except Exception as e:
-        print("DIAG failed", e)
 
     if legs:
         V = pd.concat([v for v, _ in legs], axis=1).reindex(idx)
@@ -152,10 +142,6 @@ def compute(positions, closes, settings=None, live=None):
         den = V.sum(axis=1, min_count=1)
         held = den > 0
         r_port = (G.sum(axis=1, min_count=1) / den).where(held)
-        try:
-            print("DIAG r_port", [round(float(x), 5) if pd.notna(x) else None for x in r_port.iloc[-5:]])
-        except Exception as e:
-            print("DIAG failed", e)
     else:
         held = pd.Series(False, index=idx)
         r_port = pd.Series(float("nan"), index=idx)
@@ -360,14 +346,16 @@ def main():
     closes = closes.dropna(how="all")
     open_tickers = sorted({p["ticker"] for p in positions if not p.get("exitDate")})
     live = latest_prices(open_tickers)
-    try:
-        for c in ["9984.T", "NU", "MDA", "^GSPC"]:
-            if c in closes.columns:
-                print("DIAG closes", c, [(str(i), round(float(v), 3)) for i, v in closes[c].dropna().iloc[-4:].items()])
-        print("DIAG live", live)
-    except Exception as e:
-        print("DIAG failed", e)
+    # Yahoo's daily row for the current session can lag the actual trades (e.g. a Tokyo close still showing the
+    # previous day's price). Use the latest traded price for that day's row instead.
+    for t, info in live.items():
+        if t in closes.columns:
+            day = pd.Timestamp(info["time"]).tz_convert("America/New_York").tz_localize(None).normalize() + EOD
+            if day in closes.index:
+                closes.loc[day, t] = float(info["price"])
+    print("Total return now:", end=" ")
     last, series = compute(positions, closes, settings, live)
+    print(series[-1][1] if series else None)
     for t, v in live.items():
         last[t] = v["price"]           # open positions are marked at the latest trade, in whatever session
     OUT.write_text(json.dumps({
