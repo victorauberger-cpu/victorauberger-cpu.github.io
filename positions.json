@@ -64,8 +64,8 @@
   {"ticker": "P", "name": "Everpure", "side": "short", "entryDate": "2026-11-19", "entry": 112.73, "exitDate": "2026-11-19", "exit": 111.65, "leverage": 5, "thesis": "The whole market turned lower after strong gains at the open; Everpure, among the day's biggest gainers, is expected to give back its move."},
   {"ticker": "ANT", "name": "Anthropic", "side": "long", "entryDate": "2026-11-19", "entry": 114.85, "exitDate": "2026-11-19", "exit": 103.64, "leverage": 5, "thesis": ""},
   {"ticker": "ANT", "name": "Anthropic", "side": "long", "entryDate": "2026-11-19", "entry": 111.31, "exitDate": "2026-11-19", "exit": 103.64, "leverage": 5, "thesis": ""},
-  {"ticker": "ANT", "name": "Anthropic", "side": "short", "entryDate": "2026-11-19", "entry": 108.11, "exitDate": "", "exit": null, "leverage": 5, "thesis": ""},
+  {"ticker": "ANT", "name": "Anthropic", "side": "short", "entryDate": "2026-11-19", "entry": 108.11, "exitDate": "2026-11-19", "exit": 101.62, "leverage": 5, "thesis": ""},
   {"ticker": "ANT", "name": "Anthropic", "side": "long", "entryDate": "2026-11-19", "entry": 110.48, "exitDate": "2026-11-19", "exit": 103.64, "leverage": 5, "thesis": ""},
   {"ticker": "ANT", "name": "Anthropic", "side": "long", "entryDate": "2026-11-19", "entry": 106.83, "exitDate": "2026-11-19", "exit": 103.64, "leverage": 5, "thesis": ""},
-  {"ticker": "ANT", "name": "Anthropic", "side": "short", "entryDate": "2026-11-19", "entry": 103.64, "exitDate": "", "exit": null, "leverage": 5, "thesis": ""}
+  {"ticker": "ANT", "name": "Anthropic", "side": "short", "entryDate": "2026-11-19", "entry": 103.64, "exitDate": "2026-11-19", "exit": 101.62, "leverage": 5, "thesis": ""}
 ]
