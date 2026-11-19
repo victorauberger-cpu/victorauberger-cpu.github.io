@@ -65,5 +65,6 @@
   {"ticker": "ANT", "name": "Anthropic", "side": "long", "entryDate": "2026-11-19", "entry": 114.85, "exitDate": "", "exit": null, "leverage": 5, "thesis": ""},
   {"ticker": "ANT", "name": "Anthropic", "side": "long", "entryDate": "2026-11-19", "entry": 111.31, "exitDate": "", "exit": null, "leverage": 5, "thesis": ""},
   {"ticker": "ANT", "name": "Anthropic", "side": "short", "entryDate": "2026-11-19", "entry": 108.11, "exitDate": "", "exit": null, "leverage": 5, "thesis": ""},
-  {"ticker": "ANT", "name": "Anthropic", "side": "long", "entryDate": "2026-11-19", "entry": 110.48, "exitDate": "", "exit": null, "leverage": 5, "thesis": ""}
+  {"ticker": "ANT", "name": "Anthropic", "side": "long", "entryDate": "2026-11-19", "entry": 110.48, "exitDate": "", "exit": null, "leverage": 5, "thesis": ""},
+  {"ticker": "ANT", "name": "Anthropic", "side": "long", "entryDate": "2026-11-19", "entry": 106.83, "exitDate": "", "exit": null, "leverage": 5, "thesis": ""}
 ]
