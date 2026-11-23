@@ -150,6 +150,8 @@ def main():
             cond = (bars["Close"] >= lim) if up else (bars["Close"] <= lim)
             mins = bars.index.hour * 60 + bars.index.minute
             regular = (mins >= 570) & (mins < 960)
+            if "." in o["ticker"]:              # non-US listing: Yahoo only has its regular session
+                regular = regular | True
             cond = cond & (regular | cond.shift(1, fill_value=False))
             hit = bars[cond]
         else:
