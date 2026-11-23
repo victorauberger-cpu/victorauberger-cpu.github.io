@@ -144,7 +144,16 @@ def main():
         if exp is not None and len(bars):
             bars = bars[bars.index < exp.tz_convert(ET)]
         # Trigger on 5-minute closing prices: Yahoo's bar highs and lows include stray prints that brokers don't show.
-        hit = (bars[bars["Close"] >= lim] if up else bars[bars["Close"] <= lim]) if len(bars) else bars
+        # Outside regular hours (thin volume) Yahoo keeps stray prints that brokers' charts filter out, so there
+        # the level must hold for two 5-minute closes in a row before the order counts as filled.
+        if len(bars):
+            cond = (bars["Close"] >= lim) if up else (bars["Close"] <= lim)
+            mins = bars.index.hour * 60 + bars.index.minute
+            regular = (mins >= 570) & (mins < 960)
+            cond = cond & (regular | cond.shift(1, fill_value=False))
+            hit = bars[cond]
+        else:
+            hit = bars
         if len(hit):
             ts, bar = hit.index[0], hit.iloc[0]
             price = round(max(lim, float(bar["Open"])) if up else min(lim, float(bar["Open"])), 4)  # gap through: open
