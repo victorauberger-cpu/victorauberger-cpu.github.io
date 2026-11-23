@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
   pages: write
   id-token: write
 
@@ -31,6 +32,8 @@ jobs:
           python-version: "3.12"
       - run: pip install yfinance pandas
       - name: Check pending orders (orders.json)
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           python orders.py || echo "::warning::Order check failed"
           if ! git diff --quiet -- orders.json positions.json; then
@@ -38,7 +41,11 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add orders.json positions.json
             git commit -m "Order filled (automatic)"
-            git pull --rebase origin main && git push origin HEAD:main || echo "::warning::Could not save the filled order"
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              python notify.py || echo "::warning::Could not send the fill email"
+            else
+              echo "::warning::Could not save the filled order"
+            fi
           fi
       - name: Fetch prices from Yahoo Finance
         env:

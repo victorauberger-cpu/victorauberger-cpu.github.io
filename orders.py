@@ -83,6 +83,16 @@ def fill_date(ts_et):
     return d.strftime("%Y-%m-%d")
 
 
+FILL_LOG = Path("/tmp/fills.jsonl")      # read by notify.py, which emails each fill (via a GitHub issue)
+
+
+def log_fill(o, price, ts):
+    with FILL_LOG.open("a") as f:
+        f.write(json.dumps({"ticker": o["ticker"], "name": o.get("name", o["ticker"]), "side": o["side"],
+                            "action": o.get("action", "open"), "limit": o.get("stop", o.get("limit")),
+                            "price": price, "leverage": o.get("leverage", 1), "time": ts.isoformat()}) + "\n")
+
+
 def apply_fill(o, price, ts, positions):
     """Record a filled order. Opening orders add a position; closing orders fill in the exit of the open one."""
     if o.get("action", "open") == "close":
@@ -140,6 +150,7 @@ def main():
             price = round(max(lim, float(bar["Open"])) if up else min(lim, float(bar["Open"])), 4)  # gap through: open
             if apply_fill(o, price, ts, positions):
                 print(f"FILLED: {what} -> {price} ({ts:%Y-%m-%d %H:%M} ET)")
+                log_fill(o, price, ts)
             changed = True
             continue
         if in_overnight(now) and (exp is None or now < exp):
@@ -152,6 +163,7 @@ def main():
                 ts = now.tz_convert(ET).floor("min")
                 if apply_fill(o, px, ts, positions):
                     print(f"FILLED overnight: {what} -> {px} ({ts:%Y-%m-%d %H:%M} ET)")
+                    log_fill(o, px, ts)
                 changed = True
                 continue
             if px is not None:
