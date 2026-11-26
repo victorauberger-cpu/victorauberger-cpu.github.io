@@ -12,7 +12,8 @@ Stop orders ("type": "stop", with "stop" instead of "limit") work the other way 
 opening price if the market gapped below it. A stop that buys (closing a short) triggers at or above the stop.
 
 Order fields: ticker, name, side ("long"/"short"), action ("open", default, or "close"), limit, leverage,
-thesis, created (UTC time the order was placed), optional expires. Orders without "expires" stay open
+thesis, created (UTC time the order was placed), optional expires, optional instrument (Option, Future, CFD,
+Total return swap; copied onto the position). Status "cancelled" orders are ignored. Orders without "expires" stay open
 until filled or cancelled. Checked in every session: pre-market, regular, after-hours and overnight.
 
 The fill price is the limit, or the bar's opening price if the market gapped through the limit.
@@ -109,6 +110,7 @@ def apply_fill(o, price, ts, positions):
             "ticker": o["ticker"], "name": o.get("name", o["ticker"]), "side": o["side"],
             "entryDate": fill_date(ts), "entry": price, "exitDate": "", "exit": None,
             "leverage": o.get("leverage", 1), "thesis": o.get("thesis", ""),
+            **({"instrument": o["instrument"]} if o.get("instrument") else {}),
         })
     o.update(status="filled", fillPrice=price, fillTime=ts.isoformat())
     return True
