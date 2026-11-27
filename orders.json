@@ -47,5 +47,6 @@
   {"ticker": "PURR", "name": "Hyperliquid Strategies", "side": "long", "limit": 7.77, "leverage": 3, "thesis": "", "created": "2026-11-27T11:08:42Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"},
   {"ticker": "SPCX", "name": "Space Exploration Technologies", "side": "long", "limit": 129.75, "leverage": 3, "thesis": "", "created": "2026-11-27T11:09:12Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"},
   {"ticker": "NVDA", "name": "NVIDIA", "side": "long", "limit": 152.3, "leverage": 3, "thesis": "", "created": "2026-11-27T11:09:41Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"},
-  {"ticker": "PLTR", "name": "Palantir Technologies", "side": "long", "limit": 166.45, "leverage": 3, "thesis": "", "created": "2026-11-27T11:10:13Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"}
+  {"ticker": "PLTR", "name": "Palantir Technologies", "side": "long", "limit": 166.45, "leverage": 3, "thesis": "", "created": "2026-11-27T11:10:13Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"},
+  {"ticker": "ORCL", "name": "Oracle", "side": "long", "limit": 106.25, "leverage": 3, "thesis": "", "created": "2026-11-27T11:10:39Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"}
 ]
