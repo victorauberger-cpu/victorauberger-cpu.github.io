@@ -45,5 +45,6 @@
   {"ticker": "INTC", "name": "Intel", "side": "long", "limit": 55.75, "leverage": 3, "thesis": "", "created": "2026-11-27T11:06:52Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"},
   {"ticker": "SMR", "name": "NuScale Power", "side": "long", "limit": 3.375, "leverage": 3, "thesis": "", "created": "2026-11-27T11:07:53Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"},
   {"ticker": "PURR", "name": "Hyperliquid Strategies", "side": "long", "limit": 7.77, "leverage": 3, "thesis": "", "created": "2026-11-27T11:08:42Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"},
-  {"ticker": "SPCX", "name": "Space Exploration Technologies", "side": "long", "limit": 129.75, "leverage": 3, "thesis": "", "created": "2026-11-27T11:09:12Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"}
+  {"ticker": "SPCX", "name": "Space Exploration Technologies", "side": "long", "limit": 129.75, "leverage": 3, "thesis": "", "created": "2026-11-27T11:09:12Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"},
+  {"ticker": "NVDA", "name": "NVIDIA", "side": "long", "limit": 152.3, "leverage": 3, "thesis": "", "created": "2026-11-27T11:09:41Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"}
 ]
