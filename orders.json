@@ -40,5 +40,6 @@
   {"ticker": "BE", "name": "Bloom Energy", "side": "long", "limit": 160, "leverage": 3, "thesis": "", "created": "2026-11-27T11:02:48Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"},
   {"ticker": "ANT", "name": "Anthropic, PBC", "side": "long", "limit": 84.5, "leverage": 3, "thesis": "", "created": "2026-11-27T11:04:01Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"},
   {"ticker": "P", "name": "Everpure", "side": "long", "limit": 97.5, "leverage": 3, "thesis": "", "created": "2026-11-27T11:04:49Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"},
-  {"ticker": "MU", "name": "Micron Technology", "side": "long", "limit": 619, "leverage": 3, "thesis": "", "created": "2026-11-27T11:05:35Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"}
+  {"ticker": "MU", "name": "Micron Technology", "side": "long", "limit": 619, "leverage": 3, "thesis": "", "created": "2026-11-27T11:05:35Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"},
+  {"ticker": "SNDK", "name": "Sandisk", "side": "long", "limit": 77.5, "leverage": 3, "thesis": "", "created": "2026-11-27T11:06:11Z", "status": "open", "expires": "2026-11-27T20:00:00-05:00"}
 ]
