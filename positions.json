@@ -106,5 +106,6 @@
   {"ticker": "CIFR", "name": "Cipher Digital", "side": "long", "entryDate": "2026-11-27", "entry": 5.7, "exitDate": "", "exit": null, "leverage": 3, "thesis": ""},
   {"ticker": "CIFR", "name": "Cipher Digital", "side": "short", "entryDate": "2026-11-27", "entry": 5.455, "exitDate": "", "exit": null, "leverage": 6, "thesis": ""},
   {"ticker": "NANO", "name": "Forge Nano Holdings", "side": "long", "entryDate": "2026-11-27", "entry": 3.77, "exitDate": "2026-11-27", "exit": 3.785, "leverage": 6, "thesis": ""},
-  {"ticker": "VOYG", "name": "Voyager Technologies", "side": "short", "entryDate": "2026-11-27", "entry": 19.535, "exitDate": "", "exit": null, "leverage": 10, "thesis": ""}
+  {"ticker": "VOYG", "name": "Voyager Technologies", "side": "short", "entryDate": "2026-11-27", "entry": 19.535, "exitDate": "", "exit": null, "leverage": 10, "thesis": ""},
+  {"ticker": "VOYG", "name": "Voyager Technologies", "side": "short", "entryDate": "2026-11-27", "entry": 19.735, "exitDate": "", "exit": null, "leverage": 10.5, "thesis": ""}
 ]
