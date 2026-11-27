@@ -102,6 +102,6 @@
   {"ticker": "NVDA", "name": "NVIDIA", "side": "long", "entryDate": "2026-11-27", "entry": 151.98, "exitDate": "", "exit": null, "leverage": 3, "thesis": ""},
   {"ticker": "PLTR", "name": "Palantir Technologies", "side": "long", "entryDate": "2026-11-27", "entry": 166.45, "exitDate": "2026-11-27", "exit": 167.995, "leverage": 3, "thesis": ""},
   {"ticker": "ORCL", "name": "Oracle", "side": "long", "entryDate": "2026-11-27", "entry": 106.25, "exitDate": "", "exit": null, "leverage": 3, "thesis": ""},
-  {"ticker": "MRVL", "name": "Marvell Technology", "side": "long", "entryDate": "2026-11-27", "entry": 135.85, "exitDate": "", "exit": null, "leverage": 3, "thesis": ""},
+  {"ticker": "MRVL", "name": "Marvell Technology", "side": "long", "entryDate": "2026-11-27", "entry": 135.85, "exitDate": "2026-11-27", "exit": 136.1081, "leverage": 3, "thesis": ""},
   {"ticker": "CIFR", "name": "Cipher Digital", "side": "long", "entryDate": "2026-11-27", "entry": 5.7, "exitDate": "", "exit": null, "leverage": 3, "thesis": ""}
 ]
