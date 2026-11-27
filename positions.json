@@ -96,7 +96,7 @@
   {"ticker": "BE", "name": "Bloom Energy", "side": "long", "entryDate": "2026-11-27", "entry": 160.0, "exitDate": "", "exit": null, "leverage": 3, "thesis": ""},
   {"ticker": "MU", "name": "Micron Technology", "side": "long", "entryDate": "2026-11-27", "entry": 619, "exitDate": "2026-11-27", "exit": 619.34, "leverage": 3, "thesis": ""},
   {"ticker": "INTC", "name": "Intel", "side": "long", "entryDate": "2026-11-27", "entry": 55.75, "exitDate": "", "exit": null, "leverage": 3, "thesis": ""},
-  {"ticker": "SMR", "name": "NuScale Power", "side": "long", "entryDate": "2026-11-27", "entry": 3.375, "exitDate": "", "exit": null, "leverage": 3, "thesis": ""},
+  {"ticker": "SMR", "name": "NuScale Power", "side": "long", "entryDate": "2026-11-27", "entry": 3.375, "exitDate": "2026-11-27", "exit": 3.375, "leverage": 3, "thesis": ""},
   {"ticker": "PURR", "name": "Hyperliquid Strategies", "side": "long", "entryDate": "2026-11-27", "entry": 7.77, "exitDate": "", "exit": null, "leverage": 3, "thesis": ""},
   {"ticker": "SPCX", "name": "Space Exploration Technologies", "side": "long", "entryDate": "2026-11-27", "entry": 129.75, "exitDate": "2026-11-27", "exit": 129.75, "leverage": 3, "thesis": ""},
   {"ticker": "NVDA", "name": "NVIDIA", "side": "long", "entryDate": "2026-11-27", "entry": 151.98, "exitDate": "", "exit": null, "leverage": 3, "thesis": ""},
